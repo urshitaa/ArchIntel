@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import {
   Github,
@@ -540,6 +540,3 @@ function ExportPanel() {
     </div>
   );
 }
-
-/* hooks for effects on body — none, but keep file lint clean */
-useEffect; // no-op reference removed below
