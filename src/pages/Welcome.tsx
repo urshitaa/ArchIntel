@@ -33,6 +33,8 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import { Particles } from "@/components/landing/Particles";
 import { CountUp } from "@/components/landing/CountUp";
+import { Workspace } from "@/components/workspace/Workspace";
+import { parseRepo } from "@/components/workspace/data";
 
 const navLinks = [
   { label: "Dashboard", href: "#dashboard" },
