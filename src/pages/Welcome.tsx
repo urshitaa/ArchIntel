@@ -422,12 +422,7 @@ function Section({
 
 /* ---------- Analyzer panel ---------- */
 
-function parseRepo(url: string) {
-  const m = url.match(/github\.com\/([^/]+)\/([^/?#]+)/);
-  const owner = m?.[1] ?? "vercel";
-  const name = (m?.[2] ?? "next.js").replace(/\.git$/, "");
-  return { owner, name, full: `${owner}/${name}` };
-}
+// parseRepo imported from workspace/data
 
 function AnalyzerPanel({
   state,
