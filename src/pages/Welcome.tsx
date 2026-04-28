@@ -162,7 +162,7 @@ export default function Welcome() {
 
       {/* Hero */}
       <section id="dashboard" className="relative">
-        <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-6 py-12 lg:grid-cols-[1.05fr_1.25fr] lg:py-16">
+        <div className={`mx-auto grid max-w-7xl gap-10 px-6 py-12 lg:py-16 ${state === "results" ? "grid-cols-1" : "grid-cols-1 lg:grid-cols-[1.05fr_1.25fr]"}`}>
           <motion.div
             initial="hidden"
             animate="visible"
@@ -243,17 +243,30 @@ export default function Welcome() {
             </Stagger>
           </motion.div>
 
-          {/* Right: analyzer dashboard */}
+          {/* Right: analyzer panel — only shown before results */}
+          {state !== "results" && (
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+              className="relative"
+            >
+              <div className="absolute -inset-6 -z-10 rounded-[2rem] bg-[radial-gradient(closest-side,hsl(var(--primary)/0.18),transparent_70%)] blur-2xl" />
+              <AnalyzerPanel state={state} progress={progress} stepIdx={stepIdx} repo={repoMeta} />
+            </motion.div>
+          )}
+        </div>
+
+        {state === "results" && (
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-            className="relative"
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            className="mx-auto max-w-7xl px-6 pb-8"
           >
-            <div className="absolute -inset-6 -z-10 rounded-[2rem] bg-[radial-gradient(closest-side,hsl(var(--primary)/0.18),transparent_70%)] blur-2xl" />
-            <AnalyzerPanel state={state} progress={progress} stepIdx={stepIdx} repo={repoMeta} />
+            <Workspace repo={repoMeta} />
           </motion.div>
-        </div>
+        )}
       </section>
 
       {/* Quick Start */}
