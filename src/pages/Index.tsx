@@ -21,6 +21,8 @@ import {
 import { Particles } from "@/components/landing/Particles";
 import { CountUp } from "@/components/landing/CountUp";
 import { Reveal } from "@/components/landing/Reveal";
+import { WordReveal } from "@/components/landing/WordReveal";
+import { MagneticButton } from "@/components/landing/MagneticButton";
 
 const navLinks = [
   { label: "Features", href: "#features" },
@@ -112,10 +114,10 @@ const Navbar = () => {
             <button className="hidden sm:inline-flex items-center px-3.5 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
               Sign In
             </button>
-            <button className="shimmer relative inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-[0_0_24px_hsl(var(--primary)/0.45)] hover:shadow-[0_0_36px_hsl(var(--primary)/0.7)] transition-shadow">
+            <MagneticButton className="shimmer relative inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-[0_0_24px_hsl(var(--primary)/0.45)] hover:shadow-[0_0_36px_hsl(var(--primary)/0.7)]">
               Try for Free
               <ArrowRight className="h-3.5 w-3.5" />
-            </button>
+            </MagneticButton>
           </div>
         </nav>
       </div>
@@ -278,11 +280,10 @@ const Hero = () => (
         </a>
       </Reveal>
 
-      <Reveal delay={120} as="h1" className="mt-6 text-center text-5xl md:text-7xl font-bold tracking-[-0.03em] leading-[1.05]">
-        Instantly Understand
-        <br />
-        Any <span className="text-gradient">GitHub Repository</span>
-      </Reveal>
+      <div className="mt-6 text-center text-5xl md:text-7xl font-bold tracking-[-0.03em] leading-[1.05]">
+        <WordReveal text="Instantly Understand" delay={0.1} />
+        <WordReveal text="Any GitHub Repository" highlight="GitHub Repository" delay={0.35} />
+      </div>
 
       <Reveal delay={260} as="p" className="mt-6 text-center text-lg text-muted-foreground max-w-2xl mx-auto">
         Paste a repo URL and get architecture diagrams, dependency graphs and
@@ -299,10 +300,10 @@ const Hero = () => (
               placeholder="https://github.com/owner/repo"
             />
           </div>
-          <button className="glow-cta group inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground hover:brightness-110 transition">
+          <MagneticButton className="glow-cta group inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground hover:brightness-110">
             Analyze Repository Now
             <ArrowRight className="h-4 w-4 nudge" />
-          </button>
+          </MagneticButton>
         </div>
         <div className="mt-3 text-center text-xs text-muted-foreground inline-flex items-center gap-2 w-full justify-center">
           <span className="h-1.5 w-1.5 rounded-full bg-primary blink shadow-[0_0_6px_hsl(var(--primary))]" />
