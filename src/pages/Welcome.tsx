@@ -35,6 +35,7 @@ import { Particles } from "@/components/landing/Particles";
 import { CountUp } from "@/components/landing/CountUp";
 import { Workspace } from "@/components/workspace/Workspace";
 import { parseRepo } from "@/components/workspace/data";
+import { AnalysisPipeline } from "@/components/analyze/AnalysisPipeline";
 
 const navLinks = [
   { label: "Dashboard", href: "#dashboard" },
@@ -76,28 +77,6 @@ export default function Welcome() {
     if (!user) navigate("/signup", { replace: true });
   }, [user, navigate]);
 
-  // analyzer simulation
-  useEffect(() => {
-    if (state !== "loading") return;
-    setStepIdx(0);
-    setProgress(0);
-    const start = performance.now();
-    const total = 4200;
-    let raf = 0;
-    const tick = (t: number) => {
-      const p = Math.min(1, (t - start) / total);
-      setProgress(Math.round(p * 100));
-      setStepIdx(Math.min(loadingSteps.length - 1, Math.floor(p * loadingSteps.length)));
-      if (p < 1) raf = requestAnimationFrame(tick);
-      else {
-        setState("results");
-        setCompletedTasks((s) => new Set(s).add(0));
-      }
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [state]);
-
   const repoMeta = useMemo(() => parseRepo(url), [url]);
 
   const checklist = [
@@ -120,6 +99,21 @@ export default function Welcome() {
     <div className="relative min-h-screen overflow-x-hidden bg-background text-foreground">
       <div className="pointer-events-none absolute inset-0 grid-bg opacity-50" />
       <Particles count={22} />
+
+      <AnimatePresence>
+        {state === "loading" && (
+          <AnalysisPipeline
+            repoFull={repoMeta.full}
+            onDone={() => {
+              setState("results");
+              setCompletedTasks((s) => new Set(s).add(0));
+              requestAnimationFrame(() =>
+                document.getElementById("dashboard")?.scrollIntoView({ behavior: "smooth", block: "start" }),
+              );
+            }}
+          />
+        )}
+      </AnimatePresence>
 
       {/* Navbar */}
       <motion.header
