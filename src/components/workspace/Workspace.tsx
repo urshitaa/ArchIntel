@@ -31,6 +31,9 @@ import { FileTree } from "./FileTree";
 import { DependencyGraph } from "./DependencyGraph";
 import { AskAI } from "./AskAI";
 import { TechStack } from "./TechStack";
+import { Contributors } from "./Contributors";
+import { SecurityInsights } from "./SecurityInsights";
+import { ArchitectureView } from "./ArchitectureView";
 import { toast } from "sonner";
 
 const cardBase =
@@ -135,6 +138,21 @@ export function Workspace({ repo }: { repo: RepoMeta }) {
         <div className="h-[320px]">
           <DependencyGraph />
         </div>
+      </Panel>
+
+      {/* Architecture */}
+      <Panel title="Architecture" icon={Layers} className="lg:col-span-4" delay={0.32}>
+        <ArchitectureView />
+      </Panel>
+
+      {/* Contributors */}
+      <Panel title="Contributors" icon={Users} className="lg:col-span-4" delay={0.34}>
+        <Contributors />
+      </Panel>
+
+      {/* Security */}
+      <Panel title="Security Insights" icon={ShieldCheck} className="lg:col-span-4" delay={0.36}>
+        <SecurityInsights />
       </Panel>
 
       {/* 8. File Preview */}
