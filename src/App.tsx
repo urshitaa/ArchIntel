@@ -7,6 +7,8 @@ import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import Signup from "./pages/Signup.tsx";
 import Welcome from "./pages/Welcome.tsx";
+import { SmoothScroll } from "./components/landing/SmoothScroll";
+import { CursorSpotlight } from "./components/landing/CursorSpotlight";
 
 const queryClient = new QueryClient();
 
@@ -16,6 +18,8 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <SmoothScroll />
+        <CursorSpotlight />
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/signup" element={<Signup />} />
