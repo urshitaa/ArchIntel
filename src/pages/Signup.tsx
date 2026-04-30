@@ -1,32 +1,59 @@
-import { FormEvent, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { FormEvent, useState, useEffect } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Github, Sparkles, ArrowRight, Mail, User as UserIcon, Lock } from "lucide-react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
 import { Particles } from "@/components/landing/Particles";
 
 export default function Signup() {
-  const { signUp } = useAuth();
+  const { signUp, signIn } = useAuth();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  
+  const initialMode = searchParams.get("mode") === "login" ? "login" : "signup";
+  const [mode, setMode] = useState<"login" | "signup">(initialMode);
+  
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const onSubmit = (e: FormEvent) => {
+  useEffect(() => {
+    const currentMode = searchParams.get("mode");
+    if (currentMode === "login" && mode !== "login") setMode("login");
+    if (currentMode !== "login" && mode !== "signup") setMode("signup");
+  }, [searchParams, mode]);
+
+  const toggleMode = () => {
+    setSearchParams(mode === "signup" ? { mode: "login" } : {});
+  };
+
+  const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!email) return;
     setLoading(true);
-    setTimeout(() => {
-      signUp(name, email);
+    setError("");
+    
+    try {
+      if (mode === "signup") {
+        await signUp(name, email, password);
+      } else {
+        await signIn(email, password);
+      }
       navigate("/welcome", { replace: true });
-    }, 650);
+    } catch (err: any) {
+      setError(err.message || "An error occurred");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const onGithub = () => {
     setLoading(true);
     setTimeout(() => {
-      signUp("Octo Dev", "octo@github.dev");
+      // Mock github login for now
+      signUp("Octo Dev", "octo@github.dev", "githubpass");
       navigate("/welcome", { replace: true });
     }, 600);
   };
@@ -81,8 +108,14 @@ export default function Signup() {
           transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
           className="glass relative rounded-2xl p-8 shadow-[var(--shadow-elevated)]"
         >
-          <h2 className="text-2xl font-semibold tracking-tight">Create your account</h2>
-          <p className="mt-1 text-sm text-muted-foreground">Start exploring repositories in under a minute.</p>
+          <h2 className="text-2xl font-semibold tracking-tight">
+            {mode === "signup" ? "Create your account" : "Welcome back"}
+          </h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {mode === "signup" 
+              ? "Start exploring repositories in under a minute."
+              : "Sign in to continue exploring repositories."}
+          </p>
 
           <button
             type="button"
@@ -101,22 +134,42 @@ export default function Signup() {
           </div>
 
           <form onSubmit={onSubmit} className="space-y-4">
-            <Field icon={UserIcon} label="Full name" value={name} onChange={setName} placeholder="Ada Lovelace" />
+            {error && (
+              <div className="rounded-xl border border-red-500/50 bg-red-500/10 p-3 text-sm text-red-500">
+                {error}
+              </div>
+            )}
+            
+            {mode === "signup" && (
+              <Field icon={UserIcon} label="Full name" value={name} onChange={setName} placeholder="Ada Lovelace" />
+            )}
             <Field icon={Mail} label="Email" type="email" value={email} onChange={setEmail} placeholder="you@dev.com" required />
-            <Field icon={Lock} label="Password" type="password" value={password} onChange={setPassword} placeholder="••••••••" />
+            <Field icon={Lock} label="Password" type="password" value={password} onChange={setPassword} placeholder="••••••••" required minLength={8} />
 
             <button
               type="submit"
               disabled={loading || !email}
               className="group relative inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-glow)] transition-transform hover:scale-[1.01] disabled:opacity-60 glow-cta"
             >
-              {loading ? "Creating account..." : "Create account"}
+              {loading ? (mode === "signup" ? "Creating account..." : "Signing in...") : (mode === "signup" ? "Create account" : "Sign in")}
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
             </button>
           </form>
 
           <p className="mt-6 text-center text-xs text-muted-foreground">
-            By signing up you agree to our Terms & Privacy Policy.
+            {mode === "signup" ? (
+              <>
+                Already have an account?{" "}
+                <button type="button" onClick={toggleMode} className="text-primary hover:underline font-medium">Sign in</button>
+                <br /><br />
+                By signing up you agree to our Terms & Privacy Policy.
+              </>
+            ) : (
+              <>
+                Don't have an account?{" "}
+                <button type="button" onClick={toggleMode} className="text-primary hover:underline font-medium">Sign up</button>
+              </>
+            )}
           </p>
         </motion.div>
       </main>
@@ -132,6 +185,7 @@ function Field({
   type = "text",
   placeholder,
   required,
+  minLength,
 }: {
   icon: React.ComponentType<{ className?: string }>;
   label: string;
@@ -140,6 +194,7 @@ function Field({
   type?: string;
   placeholder?: string;
   required?: boolean;
+  minLength?: number;
 }) {
   return (
     <label className="block">
@@ -150,6 +205,7 @@ function Field({
           type={type}
           value={value}
           required={required}
+          minLength={minLength}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
           className="w-full rounded-xl border border-border bg-surface px-10 py-2.5 text-sm outline-none ring-0 transition focus:border-primary/60 focus:bg-surface-2"

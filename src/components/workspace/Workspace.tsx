@@ -74,7 +74,7 @@ function Panel({
   );
 }
 
-export function Workspace({ repo }: { repo: RepoMeta }) {
+export function Workspace({ repo, analysisResult }: { repo: RepoMeta, analysisResult?: any }) {
   const [selected, setSelected] = useState<FileNode | null>(
     fileTree[0].children?.[0]?.children?.[0] ?? null,
   );
@@ -95,7 +95,7 @@ export function Workspace({ repo }: { repo: RepoMeta }) {
           </div>
         }
       >
-        <RepoOverview repo={repo} />
+        <RepoOverview repo={repo} analysisResult={analysisResult} />
       </Panel>
 
       {/* 5. Tech Stack */}
@@ -217,7 +217,7 @@ function Stat({
   );
 }
 
-function RepoOverview({ repo }: { repo: RepoMeta }) {
+function RepoOverview({ repo, analysisResult }: { repo: RepoMeta, analysisResult?: any }) {
   return (
     <div>
       <div className="flex items-start justify-between gap-3">
@@ -226,10 +226,9 @@ function RepoOverview({ repo }: { repo: RepoMeta }) {
             <Github className="h-3 w-3" /> {repo.owner}
             <ChevronRight className="h-3 w-3" />
           </div>
-          <h2 className="mt-0.5 truncate text-xl font-semibold tracking-tight">{repo.name}</h2>
+          <h2 className="mt-0.5 truncate text-xl font-semibold tracking-tight">{analysisResult?.repository?.name || repo.name}</h2>
           <p className="mt-1 max-w-md text-[12.5px] leading-relaxed text-muted-foreground">
-            Production-grade React framework with hybrid app router, server components, and edge runtime support.
-            Modular, well-tested, plugin-driven architecture.
+            {analysisResult?.repository?.description || "Production-grade React framework with hybrid app router, server components, and edge runtime support. Modular, well-tested, plugin-driven architecture."}
           </p>
         </div>
         <div className="flex shrink-0 flex-col items-end gap-1.5">
@@ -244,11 +243,11 @@ function RepoOverview({ repo }: { repo: RepoMeta }) {
       </div>
 
       <div className="mt-3 grid grid-cols-4 gap-2">
-        <Stat icon={Star} label="Stars" value={124} suffix="k" />
-        <Stat icon={GitFork} label="Forks" value={26} suffix="k" />
+        <Stat icon={Star} label="Stars" value={analysisResult?.repository?.stars || 124000} />
+        <Stat icon={GitFork} label="Forks" value={26000} />
         <Stat icon={Eye} label="Watchers" value={1284} />
-        <Stat icon={FileCode} label="Files" value={1284} />
-        <Stat icon={Layers} label="LOC" value={486} suffix="k" />
+        <Stat icon={FileCode} label="Files" value={analysisResult?.files?.length || 1284} />
+        <Stat icon={Layers} label="LOC" value={486000} />
         <Stat icon={Users} label="Contributors" value={3142} />
         <Stat icon={Clock} label="Last commit" value={2} suffix="h" />
         <Stat icon={GitBranch} label="Branches" value={142} />

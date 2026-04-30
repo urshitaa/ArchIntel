@@ -1,0 +1,51 @@
+from app.core.constants import (
+    MAX_CHUNK_TOKENS
+)
+
+from app.utils.token_counter import (
+    estimate_tokens
+)
+
+
+class ChunkingService:
+
+    async def chunk_content(
+        self,
+        content: str
+    ):
+
+        lines = content.splitlines()
+
+        chunks = []
+
+        current_chunk = []
+
+        current_tokens = 0
+
+        for line in lines:
+
+            line_tokens = estimate_tokens(line)
+
+            if (
+                current_tokens + line_tokens
+                > MAX_CHUNK_TOKENS
+            ):
+
+                chunks.append(
+                    "\n".join(current_chunk)
+                )
+
+                current_chunk = []
+                current_tokens = 0
+
+            current_chunk.append(line)
+
+            current_tokens += line_tokens
+
+        if current_chunk:
+
+            chunks.append(
+                "\n".join(current_chunk)
+            )
+
+        return chunks

@@ -23,6 +23,7 @@ import { CountUp } from "@/components/landing/CountUp";
 import { Reveal } from "@/components/landing/Reveal";
 import { WordReveal } from "@/components/landing/WordReveal";
 import { MagneticButton } from "@/components/landing/MagneticButton";
+import { useNavigate } from "react-router-dom";
 
 const navLinks = [
   { label: "Features", href: "#features" },
@@ -77,6 +78,7 @@ const Logo = () => (
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
+  const navigate = useNavigate();
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
     window.addEventListener("scroll", onScroll);
@@ -111,10 +113,10 @@ const Navbar = () => {
             ))}
           </ul>
           <div className="flex items-center gap-2">
-            <button className="hidden sm:inline-flex items-center px-3.5 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <button onClick={() => navigate("/signup?mode=login")} className="hidden sm:inline-flex items-center px-3.5 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
               Sign In
             </button>
-            <MagneticButton className="shimmer relative inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-[0_0_24px_hsl(var(--primary)/0.45)] hover:shadow-[0_0_36px_hsl(var(--primary)/0.7)]">
+            <MagneticButton onClick={() => navigate("/signup")} className="shimmer relative inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-[0_0_24px_hsl(var(--primary)/0.45)] hover:shadow-[0_0_36px_hsl(var(--primary)/0.7)]">
               Try for Free
               <ArrowRight className="h-3.5 w-3.5" />
             </MagneticButton>
@@ -265,7 +267,11 @@ const HeroDashboard = () => (
   </div>
 );
 
-const Hero = () => (
+const Hero = () => {
+  const navigate = useNavigate();
+  const [repoUrl, setRepoUrl] = useState("https://github.com/vercel/next.js");
+  
+  return (
   <section className="relative pt-36 pb-24 overflow-hidden">
     <div className="absolute inset-0 grid-bg grid-drift" />
     <div className="absolute inset-x-0 top-32 h-[500px] bg-[radial-gradient(ellipse_at_center,hsl(var(--primary)/0.18),transparent_60%)]" />
@@ -295,12 +301,13 @@ const Hero = () => (
           <div className="flex items-center gap-2.5 px-3 flex-1">
             <Github className="h-4.5 w-4.5 text-muted-foreground" />
             <input
-              defaultValue="https://github.com/vercel/next.js"
+              value={repoUrl}
+              onChange={(e) => setRepoUrl(e.target.value)}
               className="bg-transparent w-full py-2.5 text-sm font-mono outline-none placeholder:text-muted-foreground"
               placeholder="https://github.com/owner/repo"
             />
           </div>
-          <MagneticButton className="glow-cta group inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground hover:brightness-110">
+          <MagneticButton onClick={() => navigate(`/welcome?repo=${encodeURIComponent(repoUrl)}`)} className="glow-cta group inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground hover:brightness-110">
             Analyze Repository Now
             <ArrowRight className="h-4 w-4 nudge" />
           </MagneticButton>
@@ -316,7 +323,8 @@ const Hero = () => (
       </Reveal>
     </div>
   </section>
-);
+  );
+};
 
 const TrustBar = () => (
   <section className="py-14 border-y border-border/60 bg-surface/40">

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Sparkles,
@@ -36,6 +36,7 @@ import { CountUp } from "@/components/landing/CountUp";
 import { Workspace } from "@/components/workspace/Workspace";
 import { parseRepo } from "@/components/workspace/data";
 import { AnalysisPipeline } from "@/components/analyze/AnalysisPipeline";
+import { fetchApi } from "@/lib/api";
 
 const navLinks = [
   { label: "Dashboard", href: "#dashboard" },
@@ -67,11 +68,21 @@ const features = [
 export default function Welcome() {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
-  const [url, setUrl] = useState("https://github.com/vercel/next.js");
+  const [searchParams] = useSearchParams();
+  const initialUrl = searchParams.get("repo") || "https://github.com/vercel/next.js";
+  const [url, setUrl] = useState(initialUrl);
   const [state, setState] = useState<AnalyzerState>("idle");
   const [stepIdx, setStepIdx] = useState(0);
   const [progress, setProgress] = useState(0);
   const [completedTasks, setCompletedTasks] = useState<Set<number>>(new Set());
+  const [analysisPromise, setAnalysisPromise] = useState<Promise<any> | undefined>(undefined);
+  const [analysisResult, setAnalysisResult] = useState<any>(null);
+
+  useEffect(() => {
+    if (searchParams.get("repo") && state === "idle") {
+      onAnalyze();
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     if (!user) navigate("/signup", { replace: true });
@@ -91,6 +102,16 @@ export default function Welcome() {
   const onAnalyze = () => {
     if (!url.trim()) return;
     setState("loading");
+    
+    const promise = fetchApi("/repositories/analyze", {
+      method: "POST",
+      body: JSON.stringify({ repo_url: url }),
+    }).then(res => {
+      setAnalysisResult(res);
+      return res;
+    });
+    
+    setAnalysisPromise(promise);
   };
 
   if (!user) return null;
@@ -104,6 +125,7 @@ export default function Welcome() {
         {state === "loading" && (
           <AnalysisPipeline
             repoFull={repoMeta.full}
+            analysisPromise={analysisPromise}
             onDone={() => {
               setState("results");
               setCompletedTasks((s) => new Set(s).add(0));
@@ -258,7 +280,7 @@ export default function Welcome() {
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
             className="mx-auto max-w-7xl px-6 pb-8"
           >
-            <Workspace repo={repoMeta} />
+            <Workspace repo={repoMeta} analysisResult={analysisResult} />
           </motion.div>
         )}
       </section>

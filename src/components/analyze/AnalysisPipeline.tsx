@@ -135,9 +135,11 @@ const STEPS: PipelineStep[] = [
 
 export function AnalysisPipeline({
   repoFull,
+  analysisPromise,
   onDone,
 }: {
   repoFull: string;
+  analysisPromise?: Promise<any>;
   onDone: () => void;
 }) {
   const [active, setActive] = useState(0);
@@ -174,6 +176,14 @@ export function AnalysisPipeline({
         }
       }
       if (cancelled) return;
+      if (analysisPromise) {
+        setLogs((l) => [...l, { stepId: "_wait", line: "waiting for backend analysis...", tone: "muted" }]);
+        try {
+          await analysisPromise;
+        } catch (e) {
+          setLogs((l) => [...l, { stepId: "_wait", line: "analysis failed", tone: "muted" }]);
+        }
+      }
       setProgress(100);
       await new Promise((r) => setTimeout(r, 350));
       if (!cancelled) onDone();
