@@ -14,6 +14,8 @@ async def analyze_repository(request: AnalyzeRequest):
     try:
         service = RepositoryAnalysisService()
         result = await service.analyze_repository(request.repo_url)
+        app_logger.info(f" 🤣🤣🤣🤣🤣🤣Analysis result: {result}")
+       # print(f"Analysis result: {result}")
         return result
     except Exception as e:
         app_logger.error(f"Error analyzing repository: {e}")

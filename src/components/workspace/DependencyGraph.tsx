@@ -5,13 +5,16 @@ import { dependencies } from "./data";
 
 type Node = { id: string; x: number; y: number; type: "center" | "direct" | "transitive" };
 
-export function DependencyGraph() {
+export function DependencyGraph({ data }: { data?: any[] }) {
   const [filter, setFilter] = useState<"all" | "direct" | "transitive">("all");
   const [zoom, setZoom] = useState(1);
   const [hover, setHover] = useState<string | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
 
-  const visible = dependencies.filter((d) => filter === "all" || d.type === filter);
+  const fallbackDependencies = dependencies;
+  const actualData = data && data.length > 0 ? data : fallbackDependencies;
+
+  const visible = actualData.filter((d) => filter === "all" || d.type === filter);
 
   const nodes: Node[] = useMemo(() => {
     const cx = 230;
@@ -35,7 +38,7 @@ export function DependencyGraph() {
     const out: { from: string; to: string }[] = [];
     visible.forEach((d) => {
       out.push({ from: "package", to: d.name });
-      d.deps.forEach((dep) => {
+      (d.deps || []).forEach((dep: string) => {
         if (visible.find((v) => v.name === dep)) out.push({ from: d.name, to: dep });
       });
     });
@@ -46,7 +49,7 @@ export function DependencyGraph() {
     !hover ? false : id === hover || edges.some((e) => (e.from === hover && e.to === id) || (e.to === hover && e.from === id));
 
   const findNode = (id: string) => nodes.find((n) => n.id === id)!;
-  const selectedDep = selected ? dependencies.find((d) => d.name === selected) : null;
+  const selectedDep = selected ? actualData.find((d) => d.name === selected) : null;
 
   return (
     <div className="relative h-full">

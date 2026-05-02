@@ -12,7 +12,10 @@ from app.utils.language_detector import (
 )
 
 
-async def build_file_tree(root_path: str):
+async def build_file_tree(root_path: str, ignore_dirs: set = None):
+
+    if ignore_dirs is None:
+        ignore_dirs = set()
 
     files = []
 
@@ -20,7 +23,7 @@ async def build_file_tree(root_path: str):
 
         dirs[:] = [
             d for d in dirs
-            if not should_ignore_directory(d)
+            if not should_ignore_directory(d) and d not in ignore_dirs
         ]
 
         for filename in filenames:

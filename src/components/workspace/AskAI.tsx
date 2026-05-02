@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Send, Sparkles, User } from "lucide-react";
-import { answerFor } from "./data";
+import { getGeminiModel } from "@/lib/gemini";
 
 type Msg = { role: "user" | "ai"; text: string; streaming?: boolean };
 
@@ -12,7 +12,7 @@ const suggestions = [
   "Explain the build process.",
 ];
 
-export function AskAI() {
+export function AskAI({ result }: { result?: any }) {
   const [msgs, setMsgs] = useState<Msg[]>([
     { role: "ai", text: "Hi! Ask me anything about this repository." },
   ]);
@@ -21,27 +21,51 @@ export function AskAI() {
   const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (msgs.length > 1) {
+      endRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
   }, [msgs]);
 
-  const ask = (q: string) => {
+  const ask = async (q: string) => {
     if (!q.trim() || streaming) return;
-    const full = answerFor(q);
+    
     setMsgs((m) => [...m, { role: "user", text: q }, { role: "ai", text: "", streaming: true }]);
     setInput("");
     setStreaming(true);
-    let i = 0;
-    const tick = () => {
-      i += 3;
+
+    try {
+      const model = getGeminiModel();
+      
+      const prompt = `You are a helpful AI assistant explaining a codebase to a developer. Use the following repository data context to answer the user's question accurately.\n\nRepository Data: ${JSON.stringify(result || {})}\n\nUser Question: ${q}`;
+      
+      const streamResult = await model.generateContentStream(prompt);
+      
+      let fullResponse = "";
+      for await (const chunk of streamResult.stream) {
+        const chunkText = chunk.text();
+        fullResponse += chunkText;
+        setMsgs((m) => {
+          const copy = [...m];
+          copy[copy.length - 1] = { role: "ai", text: fullResponse, streaming: true };
+          return copy;
+        });
+      }
+      
       setMsgs((m) => {
         const copy = [...m];
-        copy[copy.length - 1] = { role: "ai", text: full.slice(0, i), streaming: i < full.length };
+        copy[copy.length - 1] = { role: "ai", text: fullResponse, streaming: false };
         return copy;
       });
-      if (i < full.length) setTimeout(tick, 18);
-      else setStreaming(false);
-    };
-    setTimeout(tick, 250);
+    } catch (e) {
+      console.error("Gemini stream error:", e);
+      setMsgs((m) => {
+        const copy = [...m];
+        copy[copy.length - 1] = { role: "ai", text: "Sorry, I couldn't generate an answer. Please check your Gemini API key and try again.", streaming: false };
+        return copy;
+      });
+    } finally {
+      setStreaming(false);
+    }
   };
 
   return (
@@ -64,7 +88,7 @@ export function AskAI() {
                 className={`max-w-[85%] rounded-lg px-2.5 py-1.5 text-[12px] leading-relaxed ${
                   m.role === "user"
                     ? "bg-primary/15 text-foreground"
-                    : "border border-border/60 bg-surface/60 text-muted-foreground"
+                    : "border border-border/60 bg-surface/60 text-muted-foreground whitespace-pre-wrap"
                 }`}
               >
                 {m.text}

@@ -245,18 +245,39 @@ export function AnalysisPipeline({
           </div>
         </div>
 
+        {/* Radar Scanner / Robot Thing */}
+        <div className="mt-8 flex justify-center">
+          <div className="relative flex h-32 w-32 items-center justify-center">
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
+              className="absolute h-[180px] w-[180px] rounded-full border-[1.5px] border-dashed border-primary/30"
+            />
+            <motion.div
+              animate={{ rotate: -360 }}
+              transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+              className="absolute h-[240px] w-[240px] rounded-full border border-dashed border-primary/20"
+            />
+            <div className="absolute h-[120px] w-[120px] rounded-full border border-primary/40 shadow-[0_0_30px_hsl(var(--primary)/0.2)]" />
+            
+            <div className="relative z-10 flex h-16 w-16 items-center justify-center rounded-full bg-background border border-primary shadow-[0_0_20px_hsl(var(--primary)/0.5)]">
+              <Github className="h-8 w-8 text-primary" />
+            </div>
+          </div>
+        </div>
+
         {/* Headline */}
-        <div className="mt-7">
+        <div className="mt-12 text-center">
           <h2 className="text-2xl font-semibold tracking-tight md:text-3xl">
             Exploring the codebase…
           </h2>
-          <p className="mt-1.5 text-sm text-muted-foreground">
+          <p className="mt-2 text-sm text-muted-foreground max-w-lg mx-auto">
             We’re reading every file, mapping dependencies, and generating
             human-friendly explanations.
           </p>
 
           {/* progress bar */}
-          <div className="mt-4 h-1 w-full overflow-hidden rounded-full bg-surface">
+          <div className="mt-6 mx-auto max-w-md h-1 w-full overflow-hidden rounded-full bg-surface">
             <motion.div
               className="h-full bg-gradient-to-r from-primary to-[hsl(var(--primary-glow))] shadow-[0_0_18px_hsl(var(--primary)/0.6)]"
               animate={{ width: `${progress}%` }}

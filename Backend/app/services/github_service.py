@@ -111,3 +111,43 @@ class GitHubService:
             tar.extractall(path=extract_path)
 
         return extract_path
+
+    async def fetch_languages(self, owner: str, repo: str):
+        endpoint = f"{self.BASE_URL}/repos/{owner}/{repo}/languages"
+        async with httpx.AsyncClient(timeout=30) as client:
+            response = await client.get(endpoint, headers=self.headers)
+            if response.status_code == 200:
+                return response.json()
+            return {}
+
+    async def fetch_contributors(self, owner: str, repo: str):
+        endpoint = f"{self.BASE_URL}/repos/{owner}/{repo}/contributors?per_page=100"
+        async with httpx.AsyncClient(timeout=30) as client:
+            response = await client.get(endpoint, headers=self.headers)
+            if response.status_code == 200:
+                return response.json()
+            return []
+
+    async def fetch_recent_commits(self, owner: str, repo: str):
+        endpoint = f"{self.BASE_URL}/repos/{owner}/{repo}/commits?per_page=10"
+        async with httpx.AsyncClient(timeout=30) as client:
+            response = await client.get(endpoint, headers=self.headers)
+            if response.status_code == 200:
+                commits_data = response.json()
+                return [
+                    {
+                        "sha": commit.get("sha"),
+                        "message": commit.get("commit", {}).get("message"),
+                        "author": commit.get("commit", {}).get("author", {}).get("name"),
+                        "date": commit.get("commit", {}).get("author", {}).get("date")
+                    } for commit in commits_data
+                ]
+            return []
+
+    async def fetch_branches(self, owner: str, repo: str):
+        endpoint = f"{self.BASE_URL}/repos/{owner}/{repo}/branches?per_page=100"
+        async with httpx.AsyncClient(timeout=30) as client:
+            response = await client.get(endpoint, headers=self.headers)
+            if response.status_code == 200:
+                return [b.get("name") for b in response.json()]
+            return []

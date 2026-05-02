@@ -24,13 +24,9 @@ import { Reveal } from "@/components/landing/Reveal";
 import { WordReveal } from "@/components/landing/WordReveal";
 import { MagneticButton } from "@/components/landing/MagneticButton";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 
-const navLinks = [
-  { label: "Features", href: "#features" },
-  { label: "How it Works", href: "#how" },
-  { label: "Insights", href: "#insights" },
-  { label: "My Reports", href: "#reports" },
-];
+
 
 const features = [
   { icon: BookOpen, title: "Smart Project Overview", desc: "Instant high-level summary of any repo: purpose, stack, and architecture in plain English." },
@@ -76,56 +72,7 @@ const Logo = () => (
   </a>
 );
 
-const Navbar = () => {
-  const [scrolled, setScrolled] = useState(false);
-  const navigate = useNavigate();
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 12);
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-  return (
-    <header
-      className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 animate-fade-up ${
-        scrolled ? "py-3" : "py-5"
-      }`}
-    >
-      <div className="container">
-        <nav
-          className={`flex items-center justify-between rounded-2xl px-4 py-2.5 transition-all duration-500 ${
-            scrolled ? "glass-strong shadow-[var(--shadow-soft)]" : "glass"
-          }`}
-        >
-          <Logo />
-          <ul className="hidden md:flex items-center gap-1">
-            {navLinks.map((l) => (
-              <li key={l.label}>
-                <a
-                  href={l.href}
-                  className="group relative px-3.5 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  <span className="relative">
-                    {l.label}
-                    <span className="absolute -bottom-1 left-0 h-px w-0 bg-primary shadow-[0_0_8px_hsl(var(--primary))] transition-all duration-300 group-hover:w-full" />
-                  </span>
-                </a>
-              </li>
-            ))}
-          </ul>
-          <div className="flex items-center gap-2">
-            <button onClick={() => navigate("/signup?mode=login")} className="hidden sm:inline-flex items-center px-3.5 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
-              Sign In
-            </button>
-            <MagneticButton onClick={() => navigate("/signup")} className="shimmer relative inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-[0_0_24px_hsl(var(--primary)/0.45)] hover:shadow-[0_0_36px_hsl(var(--primary)/0.7)]">
-              Try for Free
-              <ArrowRight className="h-3.5 w-3.5" />
-            </MagneticButton>
-          </div>
-        </nav>
-      </div>
-    </header>
-  );
-};
+import { Navbar } from "@/components/layout/Navbar";
 
 const HeroDashboard = () => (
   <div className="relative">
@@ -269,60 +216,82 @@ const HeroDashboard = () => (
 
 const Hero = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [repoUrl, setRepoUrl] = useState("https://github.com/vercel/next.js");
-  
+
+  const handleAnalyze = () => {
+    if (!user) {
+      navigate("/signup?mode=login");
+    } else {
+      let owner = "vercel";
+      let repo = "next.js";
+      try {
+        const urlObj = new URL(repoUrl);
+        const parts = urlObj.pathname.split("/").filter(Boolean);
+        if (parts.length >= 2) {
+          owner = parts[0];
+          repo = parts[1].replace(".git", "");
+        }
+      } catch (e) {
+        // Fallback to default if invalid URL
+      }
+      navigate(`/workspace/${owner}/${repo}/dashboard`);
+    }
+  };
+
   return (
-  <section className="relative pt-36 pb-24 overflow-hidden">
-    <div className="absolute inset-0 grid-bg grid-drift" />
-    <div className="absolute inset-x-0 top-32 h-[500px] bg-[radial-gradient(ellipse_at_center,hsl(var(--primary)/0.18),transparent_60%)]" />
-    <Particles count={28} />
+    <section className="relative pt-36 pb-24 overflow-hidden">
+      <div className="absolute inset-0 grid-bg grid-drift" />
+      <div className="absolute inset-x-0 top-32 h-[500px] bg-[radial-gradient(ellipse_at_center,hsl(var(--primary)/0.18),transparent_60%)]" />
+      <Particles count={28} />
 
-    <div className="container relative">
-      <Reveal className="flex justify-center">
-        <a href="#" className="glass rounded-full px-3.5 py-1.5 text-xs text-muted-foreground inline-flex items-center gap-2">
-          <span className="h-1.5 w-1.5 rounded-full bg-primary blink shadow-[0_0_8px_hsl(var(--primary))]" />
-          New: AI 3-Step Breakdown is live
-          <ArrowRight className="h-3 w-3" />
-        </a>
-      </Reveal>
+      <div className="container relative">
+        <Reveal className="flex justify-center">
+          <a href="#" className="glass rounded-full px-3.5 py-1.5 text-xs text-muted-foreground inline-flex items-center gap-2">
+            <span className="h-1.5 w-1.5 rounded-full bg-primary blink shadow-[0_0_8px_hsl(var(--primary))]" />
+            New: AI 3-Step Breakdown is live
+            <ArrowRight className="h-3 w-3" />
+          </a>
+        </Reveal>
 
-      <div className="mt-6 text-center text-5xl md:text-7xl font-bold tracking-[-0.03em] leading-[1.05]">
-        <WordReveal text="Instantly Understand" delay={0.1} />
-        <WordReveal text="Any GitHub Repository" highlight="GitHub Repository" delay={0.35} />
-      </div>
+        <div className="mt-6 text-center text-5xl md:text-7xl font-bold tracking-[-0.03em] leading-[1.05]">
+          <WordReveal text="Instantly Understand" delay={0.1} />
+          <WordReveal text="Any GitHub Repository" highlight="GitHub Repository" delay={0.35} />
+        </div>
 
-      <Reveal delay={260} as="p" className="mt-6 text-center text-lg text-muted-foreground max-w-2xl mx-auto">
-        Paste a repo URL and get architecture diagrams, dependency graphs and
-        an AI explanation in seconds — built for curious developers.
-      </Reveal>
+        <Reveal delay={260} as="p" className="mt-6 text-center text-lg text-muted-foreground max-w-2xl mx-auto">
+          Paste a repo URL and get architecture diagrams, dependency graphs and
+          an AI explanation in seconds — built for curious developers.
+        </Reveal>
 
-      <Reveal delay={420} className="mt-9 max-w-2xl mx-auto">
-        <div className="glass rounded-2xl p-2 flex flex-col sm:flex-row gap-2 neon-border focus-within:shadow-[var(--shadow-glow)] transition-shadow">
-          <div className="flex items-center gap-2.5 px-3 flex-1">
-            <Github className="h-4.5 w-4.5 text-muted-foreground" />
-            <input
-              value={repoUrl}
-              onChange={(e) => setRepoUrl(e.target.value)}
-              className="bg-transparent w-full py-2.5 text-sm font-mono outline-none placeholder:text-muted-foreground"
-              placeholder="https://github.com/owner/repo"
-            />
+        <Reveal delay={420} className="mt-9 max-w-2xl mx-auto">
+          <div className="glass rounded-2xl p-2 flex flex-col sm:flex-row gap-2 neon-border focus-within:shadow-[var(--shadow-glow)] transition-shadow">
+            <div className="flex items-center gap-2.5 px-3 flex-1">
+              <Github className="h-4.5 w-4.5 text-muted-foreground" />
+              <input
+                value={repoUrl}
+                onChange={(e) => setRepoUrl(e.target.value)}
+                className="bg-transparent w-full py-2.5 text-sm font-mono outline-none placeholder:text-muted-foreground"
+                placeholder="https://github.com/owner/repo"
+              />
+            </div>
+
+            <MagneticButton onClick={handleAnalyze} className="glow-cta group inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground hover:brightness-110">
+              Analyze Repository Now
+              <ArrowRight className="h-4 w-4 nudge" />
+            </MagneticButton>
           </div>
-          <MagneticButton onClick={() => navigate(`/welcome?repo=${encodeURIComponent(repoUrl)}`)} className="glow-cta group inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground hover:brightness-110">
-            Analyze Repository Now
-            <ArrowRight className="h-4 w-4 nudge" />
-          </MagneticButton>
-        </div>
-        <div className="mt-3 text-center text-xs text-muted-foreground inline-flex items-center gap-2 w-full justify-center">
-          <span className="h-1.5 w-1.5 rounded-full bg-primary blink shadow-[0_0_6px_hsl(var(--primary))]" />
-          No signup required • Results in seconds
-        </div>
-      </Reveal>
+          <div className="mt-3 text-center text-xs text-muted-foreground inline-flex items-center gap-2 w-full justify-center">
+            <span className="h-1.5 w-1.5 rounded-full bg-primary blink shadow-[0_0_6px_hsl(var(--primary))]" />
+            No signup required • Results in seconds
+          </div>
+        </Reveal>
 
-      <Reveal delay={620} className="mt-16 max-w-5xl mx-auto">
-        <HeroDashboard />
-      </Reveal>
-    </div>
-  </section>
+        <Reveal delay={620} className="mt-16 max-w-5xl mx-auto">
+          <HeroDashboard />
+        </Reveal>
+      </div>
+    </section>
   );
 };
 
@@ -381,7 +350,7 @@ const Stats = () => {
   );
 };
 
-const Features = () => (
+export const Features = () => (
   <section id="features" className="py-24 relative">
     <div className="absolute inset-0 grid-bg opacity-30" />
     <div className="container relative">
@@ -417,7 +386,7 @@ const Features = () => (
   </section>
 );
 
-const HowItWorks = () => (
+export const HowItWorks = () => (
   <section id="how" className="py-24">
     <div className="container">
       <Reveal>
@@ -455,7 +424,7 @@ const HowItWorks = () => (
   </section>
 );
 
-const Testimonials = () => (
+export const Testimonials = () => (
   <section id="insights" className="py-24 relative">
     <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
     <div className="container">
@@ -591,7 +560,7 @@ const FinalCTA = () => (
   </section>
 );
 
-const Footer = () => (
+export const Footer = () => (
   <footer className="border-t border-border/60 glass-strong">
     <div className="container py-16 grid grid-cols-2 md:grid-cols-5 gap-10">
       <Reveal className="col-span-2">
@@ -655,9 +624,16 @@ const Footer = () => (
 );
 
 const Index = () => {
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 12);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   return (
     <main className="min-h-screen">
-      <Navbar />
+      <Navbar isLanding scrolled={scrolled} />
       <Hero />
       <TrustBar />
       <Stats />
