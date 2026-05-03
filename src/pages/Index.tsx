@@ -17,7 +17,11 @@ import {
   Search,
   Cpu,
   FileText,
+  Zap,
 } from "lucide-react";
+import feature1Img from "../assets/Feature1.png";
+import feature2Img from "../assets/Feature2.png";
+import feature3Img from "../assets/Feature3.png";
 import { Particles } from "@/components/landing/Particles";
 import { CountUp } from "@/components/landing/CountUp";
 import { Reveal } from "@/components/landing/Reveal";
@@ -73,6 +77,7 @@ const Logo = () => (
 );
 
 import { Navbar } from "@/components/layout/Navbar";
+import Landing from "./Landing";
 
 const HeroDashboard = () => (
   <div className="relative">
@@ -295,6 +300,7 @@ const Hero = () => {
   );
 };
 
+
 const TrustBar = () => (
   <section className="py-14 border-y border-border/60 bg-surface/40">
     <div className="container">
@@ -386,43 +392,104 @@ export const Features = () => (
   </section>
 );
 
-export const HowItWorks = () => (
-  <section id="how" className="py-24">
-    <div className="container">
-      <Reveal>
-        <div className="text-center max-w-2xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-bold tracking-tight">
-            Three Steps to <span className="text-gradient">Clarity</span>
-          </h2>
-          <p className="mt-4 text-muted-foreground">From URL to understanding in under three seconds.</p>
-        </div>
-      </Reveal>
+export const HowItWorks = () => {
+  const customSteps = [
+    {
+      n: "01",
+      title: "Connect & Analyze Instantly",
+      highlight: "No sign up. No install. No configuration.",
+      desc: "Simply paste the URL of any public GitHub repository. Our engine immediately begins fetching the source code, preparing it for deep architectural analysis without requiring any access tokens or local setup.",
+      img: feature1Img,
+      reverse: false,
+      tags: [{ icon: Github, text: "Public Repos" }, { icon: Sparkles, text: "Zero Setup" }, { icon: Zap, text: "Lightning Fast" }]
+    },
+    {
+      n: "02",
+      title: "Let AI Inspect & Explain",
+      highlight: "We parse, embed, and reason over the entire codebase.",
+      desc: "Our advanced language models dissect the repository structure, track data flows, and identify design patterns. It uncovers the 'why' behind the code, giving you senior-level insights in a matter of seconds.",
+      img: feature2Img,
+      reverse: true,
+      tags: [{ icon: Cpu, text: "Neural Parsing" }, { icon: Layers, text: "Deep Analysis" }, { icon: BookOpen, text: "Contextual Insights" }]
+    },
+    {
+      n: "03",
+      title: "Visualize, Understand, Export",
+      highlight: "Turn overwhelming complexity into pristine clarity.",
+      desc: "Navigate through interactive architecture maps and dependency graphs. Once you have the full picture, export comprehensive, presentation-ready reports to align your team and speed up onboarding.",
+      img: feature3Img,
+      reverse: false,
+      tags: [{ icon: Network, text: "Architecture Maps" }, { icon: GitBranch, text: "Dependency Trees" }, { icon: FileText, text: "PDF Reports" }]
+    }
+  ];
 
-      <div className="relative mt-16">
-        <div className="absolute left-0 right-0 top-10 hidden md:block">
-          <svg viewBox="0 0 1000 4" preserveAspectRatio="none" className="w-full h-1">
-            <line x1="0" y1="2" x2="1000" y2="2" stroke="hsl(var(--primary))" strokeOpacity="0.3" strokeDasharray="6 8" className="draw-line" />
-          </svg>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {steps.map((s, i) => (
+  return (
+    <section id="how" className="py-24 relative">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,210,185,0.03),transparent_70%)] pointer-events-none" />
+      <div className="container relative z-10">
+        <Reveal>
+          <div className="text-center max-w-3xl mx-auto">
+            <h2 className="text-4xl md:text-5xl font-bold tracking-tight">
+              Three Steps to <span className="text-gradient">Clarity</span>
+            </h2>
+            <p className="mt-4 text-muted-foreground text-lg">From URL to understanding in under three seconds.</p>
+            <p className="mt-2 text-muted-foreground text-sm">
+              Skip the setup. Skip the guesswork. Get architecture diagrams, dependency graphs,<br className="hidden sm:block" />
+              and AI explanations — all in one place.
+            </p>
+          </div>
+        </Reveal>
+
+        <div className="mt-16 flex flex-col gap-2 px-24">
+          {customSteps.map((s, i) => (
             <Reveal key={s.n} delay={i * 150}>
-              <div className="glass neon-border rounded-2xl p-6 text-center">
-                <div className="mx-auto relative grid h-16 w-16 place-items-center rounded-full bg-background border border-primary/40">
-                  <span className="absolute inset-0 rounded-full bg-primary/20 blur-md animate-pulse" />
-                  <s.icon className="relative h-6 w-6 text-primary" />
+              <div className={`glass neon-border rounded-sm p-8  flex flex-col ${s.reverse ? 'md:flex-row-reverse' : 'md:flex-row'} items-center   hover:shadow-[0_0_35px_rgba(0,210,185,0.12)] transition-shadow duration-500 group`}>
+
+                {/* Text Content */}
+                <div className="flex-1 flex gap-6 w-full">
+                  {/* Step Number Circle */}
+                  <div className="flex-shrink-0">
+                    <div className="grid h-16 w-16 place-items-center rounded-full bg-surface-2 border border-primary/30 shadow-[0_0_15px_rgba(0,210,185,0.15)] group-hover:scale-110 transition-transform duration-300">
+                      <span className="font-mono text-xl font-bold text-primary">{s.n}</span>
+                    </div>
+                  </div>
+
+                  <div className="pt-2">
+                    <h3 className="text-3xl font-extrabold tracking-tight bg-gradient-to-br from-foreground via-foreground/90 to-muted-foreground bg-clip-text text-transparent group-hover:from-primary group-hover:to-primary/70 transition-all duration-500">{s.title}</h3>
+                    <p className="mt-4 font-semibold text-primary tracking-wide text-sm uppercase letter-spacing-[0.1em]">{s.highlight}</p>
+                    <p className="mt-4 text-muted-foreground leading-relaxed max-w-md text-[15px]">{s.desc}</p>
+
+                    {s.tags && s.tags.length > 0 && (
+                      <div className="mt-8 flex flex-wrap gap-3">
+                        {s.tags.map((t, idx) => (
+                          <div key={idx} className="flex items-center gap-2 rounded-xl bg-surface-2/40 border border-border/50 px-3.5 py-2 text-xs font-medium text-foreground/80 hover:text-primary hover:border-primary/50 hover:bg-primary/5 hover:shadow-[0_0_15px_rgba(0,210,185,0.1)] transition-all duration-300 cursor-default">
+                            <t.icon className="h-4 w-4 text-primary" />
+                            {t.text}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
-                <div className="mt-4 font-mono text-xs text-primary">{s.n}</div>
-                <h3 className="mt-1 text-lg font-semibold tracking-tight">{s.title}</h3>
-                <p className="mt-2 text-sm text-muted-foreground">{s.desc}</p>
+
+                {/* Image Content */}
+                <div className="flex-1 w-full flex justify-center items-center relative">
+                  <div className="absolute inset-0 bg-primary/5 rounded-3xl blur-2xl group-hover:bg-primary/15 transition-colors duration-500 pointer-events-none" />
+                  <img
+                    src={s.img}
+                    alt={`Step ${s.n}`}
+                    className="relative w-full max-w-md object-contain filter drop-shadow-[0_0_25px_rgba(0,0,0,0.5)] group-hover:scale-[1.03] group-hover:-translate-y-2 transition-all duration-500 ease-out"
+                  />
+                </div>
+
               </div>
             </Reveal>
           ))}
         </div>
       </div>
-    </div>
-  </section>
-);
+    </section>
+  );
+};
 
 export const Testimonials = () => (
   <section id="insights" className="py-24 relative">
@@ -634,14 +701,16 @@ const Index = () => {
   return (
     <main className="min-h-screen">
       <Navbar isLanding scrolled={scrolled} />
-      <Hero />
+      <Landing />
+      {/* <Hero /> */}
       <TrustBar />
-      <Stats />
+
+
       <Features />
       <HowItWorks />
       <Testimonials />
-      <Feedback />
-      <FinalCTA />
+      {/* <Feedback />
+      <FinalCTA /> */}
       <Footer />
     </main>
   );

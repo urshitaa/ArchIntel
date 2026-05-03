@@ -34,7 +34,7 @@ export function DashboardPage() {
   const { owner, repo, analysisResult, setAnalysisResult } = useOutletContext<any>();
 
   const [repoUrl, setRepoUrl] = useState(() => {
-    return analysisResult?.repository ? `https://github.com/${analysisResult.repository.owner}/${analysisResult.repository.name}` : "https://github.com/mdn/beginner-html-site-styled";
+    return analysisResult?.repository ? `https://github.com/${analysisResult.repository.owner}/${analysisResult.repository.name}` : "";
   });
 
   const [showPipeline, setShowPipeline] = useState(false);
@@ -67,7 +67,7 @@ export function DashboardPage() {
   };
 
   return (
-    <div className="mx-auto max-w-6xl pt-8 pb-12">
+    <div id="dashboard-content" className="mx-auto max-w-6xl pt-8 pb-12">
       <AnimatePresence>
         {showPipeline && (
           <AnalysisPipeline
@@ -78,135 +78,135 @@ export function DashboardPage() {
         )}
       </AnimatePresence>
 
-      {!analysisResult && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col gap-12 w-full">
 
-          {/* Top Hero Section */}
-          <div className="flex flex-col lg:flex-row items-center gap-10">
-            {/* Left Content */}
-            <div className="flex-1 max-w-2xl">
-              <span className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-slate-300">
-                <Sparkles className="h-3.5 w-3.5 text-emerald-400" />
-                Let's get started
-              </span>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col gap-12 w-full">
 
-              <h1 className="text-4xl font-bold leading-tight tracking-tight md:text-5xl text-white mb-4">
-                Welcome, let's explore<br />
-                your <span className="text-[#2dd4bf]">first repository</span>
-              </h1>
+        {/* Top Hero Section */}
+        <div className="flex flex-col lg:flex-row items-center gap-10">
+          {/* Left Content */}
+          <div className="flex-1 max-w-2xl">
+            <span className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-slate-300">
+              <Sparkles className="h-3.5 w-3.5 text-emerald-400" />
+              Let's get started
+            </span>
 
-              <p className="text-sm md:text-base text-slate-400 leading-relaxed max-w-lg mb-8">
-                Paste any public GitHub repository link and get instant AI summaries, architecture diagrams, dependency maps, and developer insights.
-              </p>
+            <h1 className="text-4xl font-bold leading-tight tracking-tight md:text-5xl text-white mb-4">
+              Welcome, let's explore<br />
+              your <span className="text-[#2dd4bf]">first repository</span>
+            </h1>
 
-              <div className="flex flex-col sm:flex-row items-center gap-3 mb-8 w-full max-w-xl">
-                <div className="flex-1 flex items-center gap-3 rounded-xl border border-white/10 bg-[#0f172a] px-4 py-3.5 shadow-sm focus-within:border-[#2dd4bf]/50 transition-colors w-full">
-                  <Github className="h-5 w-5 text-slate-400 shrink-0" />
-                  <input
-                    value={repoUrl}
-                    onChange={(e) => setRepoUrl(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && handleAnalyze()}
-                    className="w-full bg-transparent text-sm text-slate-200 outline-none placeholder:text-slate-500"
-                    placeholder="https://github.com/mdn/beginner-html-site-styled"
-                  />
-                </div>
-                <button
-                  onClick={handleAnalyze}
-                  className="w-full sm:w-auto flex shrink-0 items-center justify-center gap-2 rounded-xl bg-[#2dd4bf] px-6 py-3.5 text-sm font-semibold text-slate-900 shadow-[0_0_20px_rgba(45,212,191,0.25)] hover:bg-[#20b2aa] hover:shadow-[0_0_25px_rgba(45,212,191,0.35)] transition-all"
-                >
-                  Analyze Repository <ArrowRight className="h-4 w-4" />
-                </button>
+            <p className="text-sm md:text-base text-slate-400 leading-relaxed max-w-lg mb-8">
+              Paste any public GitHub repository link and get instant AI summaries, architecture diagrams, dependency maps, and developer insights.
+            </p>
+
+            <div className="flex flex-col sm:flex-row items-center gap-3 mb-8 w-full max-w-xl">
+              <div className="flex-1 flex items-center gap-3 rounded-xl border border-white/10 bg-[#0f172a] px-4 py-3.5 shadow-sm focus-within:border-[#2dd4bf]/50 transition-colors w-full">
+                <Github className="h-5 w-5 text-slate-400 shrink-0" />
+                <input
+                  value={repoUrl}
+                  onChange={(e) => setRepoUrl(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleAnalyze()}
+                  className="w-full bg-transparent text-sm text-slate-200 outline-none placeholder:text-slate-500"
+                  placeholder="https://github.com/mdn/beginner-html-site-styled"
+                />
               </div>
-
-              <div className="flex flex-wrap items-center gap-3 text-xs text-slate-400">
-                <span>Try these examples:</span>
-                <button onClick={() => setRepoUrl("https://github.com/facebook/react")} className="flex items-center gap-1.5 rounded-full bg-white/5 border border-white/5 px-3 py-1.5 hover:bg-white/10 transition-colors">
-                  <Github className="h-3.5 w-3.5" /> facebook/react
-                </button>
-                <button onClick={() => setRepoUrl("https://github.com/vercel/next.js")} className="flex items-center gap-1.5 rounded-full bg-white/5 border border-white/5 px-3 py-1.5 hover:bg-white/10 transition-colors">
-                  <Github className="h-3.5 w-3.5" /> vercel/next.js
-                </button>
-                <button onClick={() => setRepoUrl("https://github.com/microsoft/vscode")} className="flex items-center gap-1.5 rounded-full bg-white/5 border border-white/5 px-3 py-1.5 hover:bg-white/10 transition-colors">
-                  <Github className="h-3.5 w-3.5" /> microsoft/vscode
-                </button>
-              </div>
+              <button
+                onClick={handleAnalyze}
+                className="w-full sm:w-auto flex shrink-0 items-center justify-center gap-2 rounded-xl bg-[#2dd4bf] px-6 py-3.5 text-sm font-semibold text-slate-900 shadow-[0_0_20px_rgba(45,212,191,0.25)] hover:bg-[#20b2aa] hover:shadow-[0_0_25px_rgba(45,212,191,0.35)] transition-all"
+              >
+                Analyze Repository <ArrowRight className="h-4 w-4" />
+              </button>
             </div>
 
-            {/* Right Abstract Graphics */}
-            <div className="hidden lg:flex flex-1 relative h-[350px] w-full justify-center items-center">
-              {/* Main Abstract Window */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1, y: [0, -8, 0] }}
-                transition={{
-                  opacity: { duration: 0.7, ease: "easeOut" },
-                  y: { duration: 6, repeat: Infinity, ease: "easeInOut" }
-                }}
-                className="absolute right-10 top-0 w-64 h-48 rounded-xl border border-white/10 bg-[#0f172a]/90 backdrop-blur-md shadow-2xl overflow-hidden rotate-[-5deg]"
-              >
-                <div className="flex gap-1.5 p-3 border-b border-white/10 bg-white/5">
-                  <div className="w-2.5 h-2.5 rounded-full bg-slate-500/50" />
-                  <div className="w-2.5 h-2.5 rounded-full bg-slate-500/50" />
-                  <div className="w-2.5 h-2.5 rounded-full bg-slate-500/50" />
-                </div>
-                <div className="p-4 space-y-3">
-                  <div className="h-2 w-3/4 rounded bg-slate-700/50" />
-                  <div className="h-2 w-1/2 rounded bg-slate-700/50" />
-                  <div className="h-2 w-5/6 rounded bg-[#2dd4bf]/40" />
-                  <div className="h-2 w-2/3 rounded bg-slate-700/50" />
-                </div>
-              </motion.div>
-
-              {/* Floating Code Block */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1, y: [0, -12, 0] }}
-                transition={{
-                  opacity: { duration: 0.5, delay: 0.2 },
-                  scale: { duration: 0.5, delay: 0.2 },
-                  y: { duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.2 }
-                }}
-                className="absolute left-10 top-16 w-24 h-24 rounded-2xl border border-indigo-500/30 bg-[#1e1b4b]/80 backdrop-blur-md flex items-center justify-center shadow-[0_0_30px_rgba(99,102,241,0.2)]"
-              >
-                <Code2 className="h-10 w-10 text-indigo-400" />
-              </motion.div>
-
-              {/* Floating Pie Chart */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1, y: [0, 10, 0] }}
-                transition={{
-                  opacity: { duration: 0.5, delay: 0.4 },
-                  scale: { duration: 0.5, delay: 0.4 },
-                  y: { duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.4 }
-                }}
-                className="absolute right-0 bottom-24 w-32 h-24 rounded-2xl border border-emerald-500/30 bg-[#064e3b]/40 backdrop-blur-md flex items-center justify-center gap-3 shadow-[0_0_30px_rgba(16,185,129,0.15)]"
-              >
-                <div className="relative w-10 h-10 rounded-full border-4 border-slate-700 border-t-emerald-400 border-r-emerald-400" />
-                <div className="space-y-1.5">
-                  <div className="w-8 h-1.5 rounded bg-emerald-400/50" />
-                  <div className="w-6 h-1.5 rounded bg-emerald-400/30" />
-                </div>
-              </motion.div>
-
-              {/* Floating Network Diagram */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1, y: [0, -15, 0] }}
-                transition={{
-                  opacity: { duration: 0.6, delay: 0.6 },
-                  scale: { duration: 0.6, delay: 0.6 },
-                  y: { duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 0.6 }
-                }}
-                className="absolute left-32 bottom-10 w-28 h-28 rounded-2xl border border-cyan-500/30 bg-[#083344]/60 backdrop-blur-md flex flex-col items-center justify-center p-3 shadow-[0_0_30px_rgba(6,182,212,0.2)]"
-              >
-                <Network className="h-12 w-12 text-cyan-400 stroke-[1.5]" />
-              </motion.div>
+            <div className="flex flex-wrap items-center gap-3 text-xs text-slate-400">
+              <span>Try these examples:</span>
+              <button onClick={() => setRepoUrl("https://github.com/facebook/react")} className="flex items-center gap-1.5 rounded-full bg-white/5 border border-white/5 px-3 py-1.5 hover:bg-white/10 transition-colors">
+                <Github className="h-3.5 w-3.5" /> facebook/react
+              </button>
+              <button onClick={() => setRepoUrl("https://github.com/vercel/next.js")} className="flex items-center gap-1.5 rounded-full bg-white/5 border border-white/5 px-3 py-1.5 hover:bg-white/10 transition-colors">
+                <Github className="h-3.5 w-3.5" /> vercel/next.js
+              </button>
+              <button onClick={() => setRepoUrl("https://github.com/microsoft/vscode")} className="flex items-center gap-1.5 rounded-full bg-white/5 border border-white/5 px-3 py-1.5 hover:bg-white/10 transition-colors">
+                <Github className="h-3.5 w-3.5" /> microsoft/vscode
+              </button>
             </div>
           </div>
 
-          {/* Explore Insights Section */}
-          {/* <div className="mt-8">
+          {/* Right Abstract Graphics */}
+          <div className="hidden lg:flex flex-1 relative h-[350px] w-full justify-center items-center">
+            {/* Main Abstract Window */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1, y: [0, -8, 0] }}
+              transition={{
+                opacity: { duration: 0.7, ease: "easeOut" },
+                y: { duration: 6, repeat: Infinity, ease: "easeInOut" }
+              }}
+              className="absolute right-10 top-0 w-64 h-48 rounded-xl border border-white/10 bg-[#0f172a]/90 backdrop-blur-md shadow-2xl overflow-hidden rotate-[-5deg]"
+            >
+              <div className="flex gap-1.5 p-3 border-b border-white/10 bg-white/5">
+                <div className="w-2.5 h-2.5 rounded-full bg-slate-500/50" />
+                <div className="w-2.5 h-2.5 rounded-full bg-slate-500/50" />
+                <div className="w-2.5 h-2.5 rounded-full bg-slate-500/50" />
+              </div>
+              <div className="p-4 space-y-3">
+                <div className="h-2 w-3/4 rounded bg-slate-700/50" />
+                <div className="h-2 w-1/2 rounded bg-slate-700/50" />
+                <div className="h-2 w-5/6 rounded bg-[#2dd4bf]/40" />
+                <div className="h-2 w-2/3 rounded bg-slate-700/50" />
+              </div>
+            </motion.div>
+
+            {/* Floating Code Block */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1, y: [0, -12, 0] }}
+              transition={{
+                opacity: { duration: 0.5, delay: 0.2 },
+                scale: { duration: 0.5, delay: 0.2 },
+                y: { duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.2 }
+              }}
+              className="absolute left-10 top-16 w-24 h-24 rounded-2xl border border-indigo-500/30 bg-[#1e1b4b]/80 backdrop-blur-md flex items-center justify-center shadow-[0_0_30px_rgba(99,102,241,0.2)]"
+            >
+              <Code2 className="h-10 w-10 text-indigo-400" />
+            </motion.div>
+
+            {/* Floating Pie Chart */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1, y: [0, 10, 0] }}
+              transition={{
+                opacity: { duration: 0.5, delay: 0.4 },
+                scale: { duration: 0.5, delay: 0.4 },
+                y: { duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.4 }
+              }}
+              className="absolute right-0 bottom-24 w-32 h-24 rounded-2xl border border-emerald-500/30 bg-[#064e3b]/40 backdrop-blur-md flex items-center justify-center gap-3 shadow-[0_0_30px_rgba(16,185,129,0.15)]"
+            >
+              <div className="relative w-10 h-10 rounded-full border-4 border-slate-700 border-t-emerald-400 border-r-emerald-400" />
+              <div className="space-y-1.5">
+                <div className="w-8 h-1.5 rounded bg-emerald-400/50" />
+                <div className="w-6 h-1.5 rounded bg-emerald-400/30" />
+              </div>
+            </motion.div>
+
+            {/* Floating Network Diagram */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1, y: [0, -15, 0] }}
+              transition={{
+                opacity: { duration: 0.6, delay: 0.6 },
+                scale: { duration: 0.6, delay: 0.6 },
+                y: { duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 0.6 }
+              }}
+              className="absolute left-32 bottom-10 w-28 h-28 rounded-2xl border border-cyan-500/30 bg-[#083344]/60 backdrop-blur-md flex flex-col items-center justify-center p-3 shadow-[0_0_30px_rgba(6,182,212,0.2)]"
+            >
+              <Network className="h-12 w-12 text-cyan-400 stroke-[1.5]" />
+            </motion.div>
+          </div>
+        </div>
+
+        {/* Explore Insights Section */}
+        {/* <div className="mt-8">
             <h2 className="text-xl font-bold text-white mb-6">Explore powerful insights</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               
@@ -265,24 +265,24 @@ export function DashboardPage() {
             </div>
           </div> */}
 
-          {/* Footer Security Banner */}
-          <div className="flex items-center justify-between rounded-2xl border border-white/5 bg-[#0b1121] p-6">
-            <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-emerald-500/10">
-                <ShieldCheck className="h-6 w-6 text-emerald-400" />
-              </div>
-              <div>
-                <h4 className="text-sm font-semibold text-white mb-1">Your data is secure</h4>
-                <p className="text-xs text-slate-400">We only analyze public repositories. No code is stored.</p>
-              </div>
+        {/* Footer Security Banner */}
+        <div className="flex items-center justify-between rounded-2xl border border-white/5 bg-[#0b1121] p-6">
+          <div className="flex items-center gap-4">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-emerald-500/10">
+              <ShieldCheck className="h-6 w-6 text-emerald-400" />
             </div>
-            <button className="flex items-center gap-1.5 text-sm font-medium text-slate-300 hover:text-white transition-colors">
-              Learn more <ChevronRight className="h-4 w-4" />
-            </button>
+            <div>
+              <h4 className="text-sm font-semibold text-white mb-1">Your data is secure</h4>
+              <p className="text-xs text-slate-400">We only analyze public repositories. No code is stored.</p>
+            </div>
           </div>
+          <button className="flex items-center gap-1.5 text-sm font-medium text-slate-300 hover:text-white transition-colors">
+            Learn more <ChevronRight className="h-4 w-4" />
+          </button>
+        </div>
 
-        </motion.div>
-      )}
+      </motion.div>
+
 
       {analysisResult && !showPipeline && (
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-1 lg:grid-cols-12 gap-6">

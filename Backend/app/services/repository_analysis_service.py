@@ -237,8 +237,7 @@ class RepositoryAnalysisService:
                     []
                 ),
                 "license": (
-                    metadata.get("license", {})
-                    .get("name")
+                    (metadata.get("license") or {}).get("name")
                 ),
             },
 

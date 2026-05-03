@@ -6,6 +6,8 @@ import { Panel } from "@/components/workspace/Shared";
 import { summaryStyles } from "@/components/workspace/data";
 import { AskAI } from "@/components/workspace/AskAI";
 import { SecurityInsights } from "@/components/workspace/SecurityInsights";
+// import { useEffect } from "react";
+import { getGeminiModel } from "@/lib/gemini";
 
 const summaryTabsList = [
   { id: "easy" as const, label: "Super Easy" },
@@ -16,6 +18,35 @@ const summaryTabsList = [
 
 export function AnalyticsPage() {
   const { analysisResult } = useOutletContext<any>() || {};
+  const [summaries, setSummaries] = useState<Partial<Record<keyof typeof summaryStyles, string>>>({});
+  const [loadingStates, setLoadingStates] = useState<Partial<Record<keyof typeof summaryStyles, boolean>>>({});
+
+  const fetchSummary = async (selectedTab: keyof typeof summaryStyles) => {
+    if (summaries[selectedTab] || loadingStates[selectedTab] || !analysisResult) return;
+
+    try {
+      setLoadingStates(prev => ({ ...prev, [selectedTab]: true }));
+      const model = getGeminiModel();
+      const stylePrompts = {
+        easy: "Explain this repository to a 5-year old.",
+        concise: "Provide a 1-sentence concise summary of this repository.",
+        detailed: "Provide a detailed summary of this repository, including its tech stack.",
+        technical: "Provide a full technical breakdown of this repository, including file structure and architecture."
+      };
+
+      const prompt = `You are an AI assistant. Analyze this repository metadata and answer the prompt.\nRepo: ${analysisResult?.repository?.name}\nDescription: ${analysisResult?.repository?.description}\nTech Stack: ${JSON.stringify(analysisResult?.tech_stack)}\nPrompt: ${stylePrompts[selectedTab]}`;
+
+      const geminiResult = await model.generateContent(prompt);
+      const text = geminiResult.response.text();
+      setSummaries(prev => ({ ...prev, [selectedTab]: text }));
+    } catch (e) {
+      console.error("Gemini API error:", e);
+      // Fallback to placeholder on error
+      setSummaries(prev => ({ ...prev, [selectedTab]: summaryStyles[selectedTab] }));
+    } finally {
+      setLoadingStates(prev => ({ ...prev, [selectedTab]: false }));
+    }
+  };
 
   return (
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
@@ -26,11 +57,21 @@ export function AnalyticsPage() {
       </Panel>
 
       <Panel title="AI Summary" icon={Sparkles} className="lg:col-span-6" delay={0.2}>
-        <SummaryTabs result={analysisResult} />
+        <SummaryTabs
+          result={analysisResult}
+          summaries={summaries}
+          loadingStates={loadingStates}
+          onFetch={fetchSummary}
+        />
       </Panel>
 
       <Panel title="Summary Comparison" icon={GitBranch} className="lg:col-span-6" delay={0.3}>
-        <SummaryCompare result={analysisResult} />
+        <SummaryCompare
+          result={analysisResult}
+          summaries={summaries}
+          loadingStates={loadingStates}
+          onFetch={fetchSummary}
+        />
       </Panel>
 
       <Panel title="Security Insights" icon={ShieldCheck} className="lg:col-span-12" delay={0.4}>
@@ -40,44 +81,16 @@ export function AnalyticsPage() {
   );
 }
 
-import { getGeminiModel } from "@/lib/gemini";
-
-function SummaryTabs({ result }: { result?: any }) {
+function SummaryTabs({ result, summaries, loadingStates, onFetch }: { result?: any; summaries: any; loadingStates: any; onFetch: (id: string) => void }) {
   const [tab, setTab] = useState<keyof typeof summaryStyles>("concise");
-  const [summaries, setSummaries] = useState<Partial<Record<keyof typeof summaryStyles, string>>>({});
-  const [loading, setLoading] = useState(false);
 
-  const fetchSummary = async (selectedTab: keyof typeof summaryStyles) => {
-    setTab(selectedTab);
-    if (summaries[selectedTab]) return;
+  // Fetch summary automatically when tab changes or component mounts
 
-    if (!result) {
-      setSummaries(prev => ({ ...prev, [selectedTab]: summaryStyles[selectedTab] }));
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const model = getGeminiModel();
-      const stylePrompts = {
-        easy: "Explain this repository to a 5-year old.",
-        concise: "Provide a 1-sentence concise summary of this repository.",
-        detailed: "Provide a detailed summary of this repository, including its tech stack.",
-        technical: "Provide a full technical breakdown of this repository, including file structure and architecture."
-      };
-
-      const prompt = `You are an AI assistant. Analyze this repository metadata and answer the prompt.\nRepo: ${result?.repository?.name}\nDescription: ${result?.repository?.description}\nTech Stack: ${JSON.stringify(result?.tech_stack)}\nPrompt: ${stylePrompts[selectedTab]}`;
-
-      const geminiResult = await model.generateContent(prompt);
-      const text = geminiResult.response.text();
-      setSummaries(prev => ({ ...prev, [selectedTab]: text }));
-    } catch (e) {
-      console.error("Gemini API error:", e);
-      setSummaries(prev => ({ ...prev, [selectedTab]: summaryStyles[selectedTab] }));
-    } finally {
-      setLoading(false);
-    }
-  };
+  // useEffect(() => {
+  //   if (result && !summaries[tab] && !loadingStates[tab]) {
+  //     onFetch(tab);
+  //   }
+  // }, [tab, result, summaries, loadingStates, onFetch]);
 
   return (
     <div>
@@ -85,7 +98,14 @@ function SummaryTabs({ result }: { result?: any }) {
         {summaryTabsList.map((t) => (
           <button
             key={t.id}
-            onClick={() => fetchSummary(t.id)}
+            // onClick={() => setTab(t.id)}
+            onClick={() => {
+              setTab(t.id);
+
+              if (!summaries[t.id] && !loadingStates[t.id]) {
+                onFetch(t.id);
+              }
+            }}
             className={`relative rounded-md px-2.5 py-1 text-[11px] transition-colors ${tab === t.id ? "text-foreground" : "text-muted-foreground hover:text-foreground"
               }`}
           >
@@ -107,16 +127,64 @@ function SummaryTabs({ result }: { result?: any }) {
         transition={{ duration: 0.25 }}
         className="mt-3 rounded-md border border-border/60 bg-surface/50 p-3 text-[12.5px] leading-relaxed text-muted-foreground min-h-[80px]"
       >
-        {loading && !summaries[tab] ? <span className="blink">▍ Generating...</span> : (summaries[tab] || summaryStyles[tab])}
+        {loadingStates[tab] ? <span className="blink">▍ Generating AI Summary...</span> : (summaries[tab] || "No summary available. Analyze a repository first.")}
       </motion.p>
     </div>
   );
 }
 
-function SummaryCompare({ result }: { result?: any }) {
-  // To avoid spamming the API, we can either use the pre-generated ones, or just show a simplified version.
-  // For demo purposes, we will fallback to the predefined summary styles for the comparison if not generated,
-  // or you could generate all 4. Let's stick to the static ones or previously generated ones for the comparison view.
+// function SummaryCompare({ result, summaries, loadingStates, onFetch }: { result?: any; summaries: any; loadingStates: any; onFetch: (id: string) => void }) {
+//   // useEffect(() => {
+//   //   if (result) {
+//   //     summaryTabsList.forEach((t) => {
+//   //       if (!summaries[t.id] && !loadingStates[t.id]) {
+//   //         onFetch(t.id);
+//   //       }
+//   //     });
+//   //   }
+//   // }, [result, summaries, loadingStates, onFetch]);
+//   useEffect(() => {
+//     if (result) {
+//       summaryTabsList.forEach((t) => {
+//         if (!summaries[t.id] && !loadingStates[t.id]) {
+//           onFetch(t.id);
+//         }
+//       });
+//     }
+//   }, [result, summaries, loadingStates, onFetch]);
+//   return (
+//     <div className="space-y-2">
+//       {summaryTabsList.map((t, i) => (
+//         <motion.div
+//           key={t.id}
+//           initial={{ opacity: 0, x: -6 }}
+//           animate={{ opacity: 1, x: 0 }}
+//           transition={{ delay: i * 0.06 }}
+//           className="rounded-md border border-border/60 bg-surface/50 p-2.5"
+//         >
+//           <div className="mb-1 flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-primary">
+//             <Sparkles className="h-2.5 w-2.5" /> {t.label}
+//           </div>
+//           <p className="text-[11.5px] leading-relaxed text-muted-foreground">
+//             {loadingStates[t.id] ? "Generating..." : (summaries[t.id] || "No summary available.")}
+//           </p>
+//         </motion.div>
+//       ))}
+//     </div>
+//   );
+// }
+
+function SummaryCompare({
+  result,
+  summaries,
+  loadingStates,
+  onFetch
+}: {
+  result?: any;
+  summaries: any;
+  loadingStates: any;
+  onFetch: (id: string) => void;
+}) {
   return (
     <div className="space-y-2">
       {summaryTabsList.map((t, i) => (
@@ -128,9 +196,15 @@ function SummaryCompare({ result }: { result?: any }) {
           className="rounded-md border border-border/60 bg-surface/50 p-2.5"
         >
           <div className="mb-1 flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-primary">
-            <Sparkles className="h-2.5 w-2.5" /> {t.label}
+            <Sparkles className="h-2.5 w-2.5" />
+            {t.label}
           </div>
-          <p className="text-[11.5px] leading-relaxed text-muted-foreground">{summaryStyles[t.id]}</p>
+
+          <p className="text-[11.5px] leading-relaxed text-muted-foreground">
+            {loadingStates[t.id]
+              ? "Generating..."
+              : (summaries[t.id] || "Click a tab to generate summary.")}
+          </p>
         </motion.div>
       ))}
     </div>

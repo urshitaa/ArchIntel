@@ -37,7 +37,7 @@ export function SidebarLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#0b1121] text-foreground font-sans">
+    <div className="flex flex-col h-screen bg-[#0b1121] text-foreground font-sans">
       <Navbar showLogo={true} onMenuClick={() => setSidebarOpen(true)} />
       
       <div className="flex flex-1 overflow-hidden relative">

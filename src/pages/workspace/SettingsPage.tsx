@@ -1,24 +1,27 @@
-import { useState } from "react";
-import { Download, Copy, Share2, Settings, CheckCircle2 } from "lucide-react";
+import { useState, useRef } from "react";
+import { useOutletContext } from "react-router-dom";
+import { LayoutGrid, Code, GitBranch, FileText, Share2, X, CheckCircle2, FileDown, RectangleVertical, RectangleHorizontal } from "lucide-react";
 import { toast } from "sonner";
-import { Panel } from "@/components/workspace/Shared";
+import { motion } from "framer-motion";
+import html2canvas from "html2canvas";
+import { jsPDF } from "jspdf";
+import { PrintReport } from "@/components/workspace/PrintReport";
 
-const exportFormats = ["Markdown", "PDF", "HTML", "JSON"] as const;
-const exportToggles = ["Repo Overview", "Tech Stack", "Tree Structure", "Summaries", "Graph"];
+const exportToggles = [
+  { id: "overview", label: "Overview", icon: LayoutGrid },
+  { id: "tech_stack", label: "Tech Stack", icon: Code },
+  { id: "tree_structure", label: "Tree Structure", icon: GitBranch },
+  { id: "summaries", label: "Summaries", icon: FileText },
+  { id: "graph", label: "Graph", icon: Share2 },
+];
 
 export function SettingsPage() {
-  return (
-    <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
-      <Panel title="Export & Share" icon={Settings} className="lg:col-span-12" delay={0.1}>
-        <ExportPanel />
-      </Panel>
-    </div>
-  );
-}
-
-function ExportPanel() {
-  const [format, setFormat] = useState<(typeof exportFormats)[number]>("Markdown");
-  const [enabled, setEnabled] = useState<Set<string>>(new Set(exportToggles));
+  const { analysisResult } = useOutletContext<any>();
+  const [enabled, setEnabled] = useState<Set<string>>(new Set(["overview", "tech_stack", "tree_structure", "summaries"]));
+  const [pageSize, setPageSize] = useState("A4");
+  const [orientation, setOrientation] = useState<"portrait" | "landscape">("portrait");
+  const [isExporting, setIsExporting] = useState(false);
+  const reportRef = useRef<HTMLDivElement>(null);
 
   const toggle = (k: string) =>
     setEnabled((s) => {
@@ -27,78 +30,177 @@ function ExportPanel() {
       return n;
     });
 
+  const handleExport = async () => {
+    if (!analysisResult || !analysisResult.repository) {
+      toast.error("No analysis data available to export. Please analyze a repository first.");
+      return;
+    }
+
+    setIsExporting(true);
+    const toastId = toast.loading("Generating comprehensive PDF report...");
+    
+    try {
+      const targetElement = reportRef.current;
+      if (!targetElement) throw new Error("Report container not found");
+      
+      const canvas = await html2canvas(targetElement, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: "#ffffff", 
+      });
+
+      const imgData = canvas.toDataURL("image/jpeg", 1.0);
+      
+      const isPortrait = orientation === "portrait";
+      const pdf = new jsPDF({
+        orientation: isPortrait ? "p" : "l",
+        unit: "mm",
+        format: pageSize.toLowerCase()
+      });
+
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
+      
+      const ratio = pdfWidth / imgWidth;
+      const heightInPdf = imgHeight * ratio;
+      
+      let position = 0;
+      let heightLeft = heightInPdf;
+
+      pdf.addImage(imgData, "JPEG", 0, position, pdfWidth, heightInPdf);
+      heightLeft -= pdfHeight;
+
+      while (heightLeft >= 0) {
+        position -= pdfHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, "JPEG", 0, position, pdfWidth, heightInPdf);
+        heightLeft -= pdfHeight;
+      }
+      
+      pdf.save(`CodeBase_Report_${analysisResult.repository.name || "App"}.pdf`);
+      
+      toast.success("PDF exported successfully!", { id: toastId });
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to generate PDF", { id: toastId });
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-      <div>
-        <div className="mb-2 text-[10px] uppercase tracking-wider text-muted-foreground">Format</div>
-        <div className="flex flex-wrap gap-1">
-          {exportFormats.map((f) => (
-            <button
-              key={f}
-              onClick={() => setFormat(f)}
-              className={`rounded-md border px-2.5 py-1 text-[11px] transition-colors ${
-                format === f
-                  ? "border-primary/60 bg-primary/15 text-primary"
-                  : "border-border bg-surface text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {f}
-            </button>
-          ))}
+    <div className="flex h-full min-h-[80vh] items-center justify-center p-4">
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="w-full max-w-md overflow-hidden rounded-2xl border border-white/5 bg-[#0d1217] p-6 shadow-2xl"
+      >
+        {/* Header */}
+        <div className="mb-6 flex items-center justify-between">
+          <div className="w-6" /> {/* Spacer for centering */}
+          <h2 className="text-[15px] font-semibold text-white">Export to PDF</h2>
+          <button className="text-slate-400 transition-colors hover:text-white">
+            <X className="h-5 w-5" />
+          </button>
         </div>
-      </div>
-      <div>
-        <div className="mb-2 text-[10px] uppercase tracking-wider text-muted-foreground">Include</div>
-        <ul className="grid grid-cols-1 gap-1">
-          {exportToggles.map((t) => {
-            const on = enabled.has(t);
+
+        {/* Options Grid */}
+        <div className="mb-6 grid grid-cols-2 gap-3">
+          {exportToggles.map((item, idx) => {
+            const isSelected = enabled.has(item.id);
+            const Icon = item.icon;
+            const isLastOdd = exportToggles.length % 2 !== 0 && idx === exportToggles.length - 1;
+
             return (
-              <li key={t}>
-                <button
-                  onClick={() => toggle(t)}
-                  className={`flex w-full items-center justify-between rounded-md border px-2.5 py-1.5 text-[11px] transition-colors ${
-                    on
-                      ? "border-primary/40 bg-primary/10 text-foreground"
-                      : "border-border bg-surface text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  <span>{t}</span>
-                  <span
-                    className={`flex h-3.5 w-3.5 items-center justify-center rounded-sm border ${
-                      on ? "border-primary bg-primary text-primary-foreground" : "border-border"
-                    }`}
-                  >
-                    {on && <CheckCircle2 className="h-3 w-3" />}
-                  </span>
-                </button>
-              </li>
+              <button
+                key={item.id}
+                onClick={() => toggle(item.id)}
+                className={`relative flex flex-col items-center justify-center gap-2 rounded-xl border p-4 transition-all ${
+                  isLastOdd ? "col-span-2" : ""
+                } ${
+                  isSelected 
+                    ? "border-[#20b2aa]/50 bg-[#20b2aa]/5 text-[#20b2aa]" 
+                    : "border-white/5 bg-white/5 text-slate-400 hover:bg-white/10"
+                }`}
+              >
+                {isSelected && (
+                  <div className="absolute right-2 top-2 flex h-4 w-4 items-center justify-center rounded-full bg-[#20b2aa] text-white">
+                    <CheckCircle2 className="h-3 w-3" strokeWidth={3} />
+                  </div>
+                )}
+                <Icon className="h-6 w-6" strokeWidth={1.5} />
+                <span className="text-[13px] font-medium text-slate-300">{item.label}</span>
+              </button>
             );
           })}
-        </ul>
-      </div>
-      <div className="flex flex-col justify-end gap-2">
-        <button
-          onClick={() => toast.success(`Exported ${enabled.size} sections as ${format}`)}
-          className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-xs font-semibold text-primary-foreground shadow-[var(--shadow-glow)] transition-transform hover:scale-[1.02]"
-        >
-          <Download className="h-3.5 w-3.5" /> Generate Report
-        </button>
-        <button
-          onClick={() => {
-            navigator.clipboard?.writeText("https://codebase-explainer.app/r/demo");
-            toast.success("Share link copied");
-          }}
-          className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-border bg-surface px-3 py-2 text-xs hover:border-primary/40"
-        >
-          <Copy className="h-3.5 w-3.5" /> Copy Share Link
-        </button>
-        <button
-          onClick={() => toast.success("Shared with team")}
-          className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-border bg-surface px-3 py-2 text-xs hover:border-primary/40"
-        >
-          <Share2 className="h-3.5 w-3.5" /> Share to Team
-        </button>
-      </div>
+        </div>
+
+        <div className="my-6 h-px w-full bg-white/5" />
+
+        {/* Page Settings */}
+        <div className="mb-8 space-y-4">
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-slate-300">Page Size</span>
+            <select 
+              value={pageSize}
+              onChange={(e) => setPageSize(e.target.value)}
+              className="w-24 rounded-lg border border-white/10 bg-transparent px-3 py-1.5 text-sm text-slate-300 outline-none focus:border-[#20b2aa]/50"
+            >
+              <option value="A4" className="bg-[#0d1217]">A4</option>
+              <option value="Letter" className="bg-[#0d1217]">Letter</option>
+              <option value="Legal" className="bg-[#0d1217]">Legal</option>
+            </select>
+          </div>
+          
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-slate-300">Orientation</span>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setOrientation("portrait")}
+                className={`flex h-9 w-12 items-center justify-center rounded-lg border transition-colors ${
+                  orientation === "portrait"
+                    ? "border-[#20b2aa]/50 bg-[#20b2aa]/10 text-[#20b2aa]"
+                    : "border-white/10 bg-transparent text-slate-400 hover:bg-white/5"
+                }`}
+              >
+                <RectangleVertical className="h-5 w-5" strokeWidth={1.5} />
+              </button>
+              <button
+                onClick={() => setOrientation("landscape")}
+                className={`flex h-9 w-12 items-center justify-center rounded-lg border transition-colors ${
+                  orientation === "landscape"
+                    ? "border-[#20b2aa]/50 bg-[#20b2aa]/10 text-[#20b2aa]"
+                    : "border-white/10 bg-transparent text-slate-400 hover:bg-white/5"
+                }`}
+              >
+                <RectangleHorizontal className="h-5 w-5" strokeWidth={1.5} />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div className="flex gap-3">
+          <button className="flex-1 rounded-xl border border-white/10 bg-transparent py-2.5 text-sm font-medium text-slate-300 transition-colors hover:bg-white/5">
+            Cancel
+          </button>
+          <button 
+            onClick={handleExport}
+            disabled={isExporting}
+            className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#20b2aa] py-2.5 text-sm font-medium text-white transition-transform hover:scale-[1.02] hover:bg-[#1da199] disabled:opacity-70 disabled:hover:scale-100"
+          >
+            {isExporting ? "Exporting..." : "Export to PDF"}
+            {!isExporting && <FileDown className="h-4 w-4" />}
+          </button>
+        </div>
+      </motion.div>
+
+      {/* Hidden PDF Report component */}
+      <PrintReport ref={reportRef} result={analysisResult} enabled={enabled} />
     </div>
   );
 }

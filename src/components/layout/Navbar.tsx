@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, Bell, Settings, LogOut, Zap, ArrowRight, Code2, Menu, X } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
@@ -21,6 +21,7 @@ const landingNavLinks = [
 export function Navbar({ showLogo = true, isLanding = false, scrolled = false, onMenuClick }: { showLogo?: boolean; isLanding?: boolean; scrolled?: boolean; onMenuClick?: () => void }) {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const containerClasses = isLanding
@@ -115,12 +116,13 @@ export function Navbar({ showLogo = true, isLanding = false, scrolled = false, o
 
           </div>
           <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-2 md:flex">
-            {(user ? dashboardNavLinks : landingNavLinks).map((l) =>
-              l.href.startsWith("#") ? (
+            {(user ? dashboardNavLinks : landingNavLinks).map((l) => {
+              const isActive = location.pathname === l.href || (l.href !== '/' && location.pathname.startsWith(l.href));
+              return l.href.startsWith("#") ? (
                 <a
                   key={l.href}
                   href={l.href}
-                  className="rounded-lg px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-surface-2 hover:text-foreground whitespace-nowrap"
+                  className={`rounded-lg px-4 py-2 text-sm transition-colors whitespace-nowrap ${isActive ? "text-foreground font-medium underline decoration-primary decoration-2 underline-offset-[6px]" : "text-muted-foreground hover:bg-surface-2 hover:text-foreground"}`}
                 >
                   {l.label}
                 </a>
@@ -128,12 +130,12 @@ export function Navbar({ showLogo = true, isLanding = false, scrolled = false, o
                 <Link
                   key={l.href}
                   to={l.href}
-                  className="rounded-lg px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-surface-2 hover:text-foreground whitespace-nowrap"
+                  className={`rounded-lg px-4 py-2 text-sm transition-colors whitespace-nowrap ${isActive ? "text-foreground font-medium underline decoration-primary decoration-2 underline-offset-[6px]" : "text-muted-foreground hover:bg-surface-2 hover:text-foreground"}`}
                 >
                   {l.label}
                 </Link>
-              )
-            )}
+              );
+            })}
           </nav>
 
           {/* Right Section */}
@@ -205,13 +207,14 @@ export function Navbar({ showLogo = true, isLanding = false, scrolled = false, o
             className="fixed inset-x-0 top-[72px] z-30 overflow-hidden bg-background/95 backdrop-blur-xl border-b border-border md:hidden"
           >
             <div className="p-4 flex flex-col gap-2">
-              {activeLinks.map((l) =>
-                l.href.startsWith("#") ? (
+              {activeLinks.map((l) => {
+                const isActive = location.pathname === l.href || (l.href !== '/' && location.pathname.startsWith(l.href));
+                return l.href.startsWith("#") ? (
                   <a
                     key={l.href}
                     href={l.href}
                     onClick={() => setMobileMenuOpen(false)}
-                    className="rounded-lg px-4 py-3 text-base font-medium text-muted-foreground transition-colors hover:bg-surface-2 hover:text-foreground"
+                    className={`rounded-lg px-4 py-3 text-base font-medium transition-colors ${isActive ? "text-foreground underline decoration-primary decoration-2 underline-offset-[6px]" : "text-muted-foreground hover:bg-surface-2 hover:text-foreground"}`}
                   >
                     {l.label}
                   </a>
@@ -220,12 +223,12 @@ export function Navbar({ showLogo = true, isLanding = false, scrolled = false, o
                     key={l.href}
                     to={l.href}
                     onClick={() => setMobileMenuOpen(false)}
-                    className="rounded-lg px-4 py-3 text-base font-medium text-muted-foreground transition-colors hover:bg-surface-2 hover:text-foreground"
+                    className={`rounded-lg px-4 py-3 text-base font-medium transition-colors ${isActive ? "text-foreground underline decoration-primary decoration-2 underline-offset-[6px]" : "text-muted-foreground hover:bg-surface-2 hover:text-foreground"}`}
                   >
                     {l.label}
                   </Link>
-                )
-              )}
+                );
+              })}
 
               {!user && (
                 <div className="mt-2 flex flex-col gap-2 border-t border-border pt-4">
