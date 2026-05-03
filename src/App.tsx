@@ -21,6 +21,7 @@ import { ArchitecturePage } from "./pages/workspace/ArchitecturePage.tsx";
 import { TechStackPage } from "./pages/workspace/TechStackPage.tsx";
 import { ContributorsPage } from "./pages/workspace/ContributorsPage.tsx";
 import { SettingsPage } from "./pages/workspace/SettingsPage.tsx";
+import { FeedbackPage } from "./pages/workspace/FeedbackPage.tsx";
 import { Reports } from "./pages/Reports.tsx";
 import { Insights } from "./pages/Insights.tsx";
 import { Pricing } from "./pages/Pricing.tsx";
@@ -53,6 +54,7 @@ const App = () => (
             <Route path="tech-stack" element={<TechStackPage />} />
             <Route path="contributors" element={<ContributorsPage />} />
             <Route path="settings" element={<SettingsPage />} />
+            <Route path="feedback" element={<FeedbackPage />} />
           </Route>
 
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

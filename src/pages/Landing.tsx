@@ -2,11 +2,10 @@ import { useState, useEffect, useRef } from "react";
 import { Github, ArrowRight, GitBranch, Database, Layers, Box, Code2 } from "lucide-react";
 import robotImg from "../assets/robo1.png";
 import rightImg from "../assets/landing_right.png";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 // ─── Tiny helpers ────────────────────────────────────────────────────────────
 
-function useNavigate() { return (path: string) => console.log("navigate →", path); }
 //function useAuth() { return { user: null }; }
 
 // ─── Particle Canvas ─────────────────────────────────────────────────────────
@@ -321,14 +320,11 @@ export default function Landing() {
     const [repoUrl, setRepoUrl] = useState("https://github.com/vercel/next.js");
     const [inputFocused, setInputFocused] = useState(false);
     console.log("User", user);
-    // const handleAnalyze = () => {
-    //     let owner = "vercel", repo = "next.js";
-    //     if (user) {
-    //         navigate(`/workspace/dashboard`);
-    //     } else {
-    //         navigate('/auth/login')
-    //     }
-    // };
+    const handleAnalyze = () => {
+        if (repoUrl.trim()) {
+            navigate(user ? `/workspace/dashboard` : '/signup?mode=login');
+        }
+    };
 
     return (
         <>
@@ -543,7 +539,7 @@ export default function Landing() {
                             fontSize: 12,
                             color: "rgba(148,163,184,0.6)",
                         }}>
-                            {["No signup required", "Results in seconds", "Built for developers"].map((t, i) => (
+                            {["Just enter the repo URL", "Results in seconds", "Built for developers"].map((t, i) => (
                                 <span key={t} style={{ display: "flex", alignItems: "center", gap: 6 }}>
                                     <span style={{
                                         width: 6, height: 6, borderRadius: "50%",
@@ -560,5 +556,159 @@ export default function Landing() {
                 </div>
             </section>
         </>
+    );
+}
+
+// ─── FAQ Section ─────────────────────────────────────────────────────────────
+
+const faqData = [
+    {
+        question: "What does GitHub Code Base Explainer actually do?",
+        answer: "It analyzes GitHub repositories and converts complex codebases into clear, human-readable explanations including architecture, workflows, dependencies, and tech stack insights."
+    },
+    {
+        question: "Can it understand large repositories?",
+        answer: "Yes. The platform is designed to process large multi-folder repositories and identify relationships between modules, services, APIs, and components efficiently."
+    },
+    {
+        question: "Is the platform beginner-friendly?",
+        answer: "Absolutely. Even users with limited coding experience can understand repositories through simplified summaries, visual explanations, and structured insights."
+    },
+    {
+        question: "Is my repository data secure?",
+        answer: "Yes. Repository data is processed securely, and the platform only reads code for analysis without modifying any files or exposing private content."
+    },
+    {
+        question: "How does this help engineering teams?",
+        answer: "It speeds up onboarding, improves documentation, reduces time spent understanding unfamiliar codebases, and helps teams collaborate more effectively."
+    }
+];
+
+export function FAQSection() {
+    const [openIndex, setOpenIndex] = useState<number | null>(0);
+
+    return (
+        <section style={{
+            padding: "80px 24px",
+            background: "#020d1a",
+            fontFamily: "'Space Grotesk', sans-serif",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+        }}>
+            {/* Tag/Label */}
+            <div style={{
+                background: "rgba(0,210,185,0.1)",
+                color: "#00d4b8",
+                padding: "6px 16px",
+                borderRadius: 20,
+                fontSize: 14,
+                fontWeight: 600,
+                marginBottom: 32,
+                display: "inline-block"
+            }}>
+                Frequently Asked Questions
+            </div>
+
+            <div style={{ maxWidth: 760, width: "100%", display: "flex", flexDirection: "column", gap: 16 }}>
+                {faqData.map((faq, index) => {
+                    const isOpen = openIndex === index;
+                    return (
+                        <div key={index} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                            {/* Question Row */}
+                            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                                <div style={{
+                                    width: 44, height: 44, borderRadius: "50%",
+                                    background: "linear-gradient(135deg, #005a50, #003630)",
+                                    color: "#00d4b8",
+                                    display: "flex", alignItems: "center", justifyContent: "center",
+                                    fontWeight: "bold", fontSize: 18, flexShrink: 0,
+                                    boxShadow: "0 4px 10px rgba(0,0,0,0.2)"
+                                }}>
+                                    Q
+                                </div>
+                                <div
+                                    onClick={() => setOpenIndex(isOpen ? null : index)}
+                                    style={{
+                                        flex: 1,
+                                        background: isOpen ? "linear-gradient(135deg, #008a7b, #006056)" : "#161b22",
+                                        padding: "16px 24px",
+                                        borderRadius: "4px 20px 20px 20px",
+                                        cursor: "pointer",
+                                        display: "flex",
+                                        justifyContent: "space-between",
+                                        alignItems: "center",
+                                        transition: "all 0.3s ease",
+                                        border: isOpen ? "1px solid rgba(0,210,185,0.3)" : "1px solid rgba(255,255,255,0.05)",
+                                        boxShadow: isOpen ? "0 4px 20px rgba(0,210,185,0.15)" : "none",
+                                        position: "relative"
+                                    }}>
+                                    {/* Tail for question */}
+                                    <div style={{
+                                        position: "absolute",
+                                        left: -8, top: 14,
+                                        width: 0, height: 0,
+                                        borderTop: "8px solid transparent",
+                                        borderBottom: "8px solid transparent",
+                                        borderRight: '8px solid ${isOpen ? "#008a7b" : "#161b22"}',
+                                        transition: "border-right-color 0.3s ease",
+                                    }} />
+
+                                    <span style={{ color: "#fff", fontSize: 16, fontWeight: 500 }}>
+                                        {faq.question}
+                                    </span>
+                                    {isOpen ?
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m18 15-6-6-6 6" /></svg>
+                                        :
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6" /></svg>
+                                    }
+                                </div>
+                            </div>
+
+                            {/* Answer Row */}
+                            <div style={{
+                                display: isOpen ? "flex" : "none",
+                                alignItems: "center",
+                                gap: 16,
+                                animation: "fadeInLine 0.3s ease-out",
+                            }}>
+                                <div style={{
+                                    flex: 1,
+                                    background: "#161b22",
+                                    padding: "20px 24px",
+                                    borderRadius: "20px 4px 20px 20px",
+                                    color: "rgba(255,255,255,0.85)",
+                                    fontSize: 15,
+                                    lineHeight: 1.6,
+                                    marginLeft: 60, // offset
+                                    border: "1px solid rgba(255,255,255,0.05)",
+                                    position: "relative"
+                                }}>
+                                    {/* Tail for answer */}
+                                    <div style={{
+                                        position: "absolute",
+                                        right: -8, top: 14,
+                                        width: 0, height: 0,
+                                        borderTop: "8px solid transparent",
+                                        borderBottom: "8px solid transparent",
+                                        borderLeft: "8px solid #161b22",
+                                    }} />
+                                    {faq.answer}
+                                </div>
+                                <div style={{
+                                    width: 44, height: 44, borderRadius: "50%",
+                                    background: "#020d1a", border: "2px solid #005a50",
+                                    color: "#fff",
+                                    display: "flex", alignItems: "center", justifyContent: "center",
+                                    fontWeight: "bold", fontSize: 18, flexShrink: 0
+                                }}>
+                                    A
+                                </div>
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+        </section>
     );
 }

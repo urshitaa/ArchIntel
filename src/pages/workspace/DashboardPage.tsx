@@ -55,6 +55,25 @@ export function DashboardPage() {
       body: JSON.stringify({ repo_url: repoUrl }),
     }).then(res => {
       setAnalysisResult(res);
+      
+      try {
+        const repo = res.repository;
+        if (repo) {
+          const history = JSON.parse(localStorage.getItem('archintel_history') || '[]');
+          const entry = {
+            owner: repo.owner || 'Unknown',
+            name: repo.name || 'Unknown',
+            description: repo.description || '',
+            timestamp: new Date().toISOString(),
+          };
+          const filtered = history.filter((h: any) => !(h.owner === entry.owner && h.name === entry.name));
+          const newHistory = [entry, ...filtered].slice(0, 50);
+          localStorage.setItem('archintel_history', JSON.stringify(newHistory));
+        }
+      } catch (e) {
+        console.error("Failed to save history", e);
+      }
+
       toast.success("Repository analyzed successfully");
       return res;
     }).catch(err => {

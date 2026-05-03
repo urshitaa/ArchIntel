@@ -419,15 +419,29 @@ export function ArchitectureView({
                         const fileName = f.path.split(/[/\\]/).pop() || "";
                         const langCode = f.language ? (f.language.length <= 3 ? f.language : f.language.substring(0, 2)).toUpperCase() : "";
                         return (
-                          <div key={idx} className="flex items-center justify-between gap-2 text-[11px] text-muted-foreground">
-                            <div className="flex items-center gap-1.5 overflow-hidden">
-                              <FileCode className="h-3 w-3 flex-shrink-0 opacity-60" />
-                              <span className="truncate" title={f.path}>{fileName}</span>
+                          <div key={idx} className="flex flex-col gap-1 text-[11px] text-muted-foreground border-b border-border/20 last:border-0 pb-1.5 mb-1.5 last:mb-0 last:pb-0">
+                            <div className="flex items-center justify-between gap-2">
+                              <div className="flex items-center gap-1.5 overflow-hidden">
+                                <FileCode className="h-3 w-3 flex-shrink-0 opacity-60" />
+                                <span className="truncate font-medium text-foreground/80" title={f.path}>{fileName}</span>
+                              </div>
+                              {langCode && (
+                                <span className="text-[9px] text-primary/70 font-mono tracking-wider flex-shrink-0 ml-2">
+                                  {langCode}
+                                </span>
+                              )}
                             </div>
-                            {langCode && (
-                              <span className="text-[9px] text-primary/70 font-mono tracking-wider flex-shrink-0 ml-2">
-                                {langCode}
-                              </span>
+                            
+                            {/* Code snippet / dependencies preview */}
+                            {(f.code || f.content) && (
+                                <div className="mt-1 bg-background/60 rounded px-1.5 py-1 font-mono text-[9px] text-muted-foreground/80 truncate border border-border/30">
+                                    {(f.code || f.content).slice(0, 80)}...
+                                </div>
+                            )}
+                            {(f.dependencies || f.imports) && (f.dependencies || f.imports).length > 0 && (
+                                <div className="mt-0.5 text-[9px] text-muted-foreground/70 truncate">
+                                    <span className="text-primary/50">deps:</span> {(f.dependencies || f.imports).join(", ")}
+                                </div>
                             )}
                           </div>
                         );

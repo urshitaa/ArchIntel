@@ -12,7 +12,9 @@ import {
   Zap,
   Sparkles,
   Bot,
-  Box
+  Share2,
+  Box,
+  MessageSquare
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { motion } from "framer-motion";
@@ -26,7 +28,8 @@ const SIDEBAR_NAV = [
   { label: "Architecture", href: "architecture", icon: Layers },
   { label: "Tech Stack", href: "tech-stack", icon: Box },
   { label: "Contributors", href: "contributors", icon: User },
-  { label: "Settings", href: "settings", icon: Settings },
+  { label: "Export", href: "settings", icon: Share2 },
+  { label: "Feedback", href: "feedback", icon: MessageSquare },
 ];
 
 export function SidebarLayout() {
@@ -39,13 +42,13 @@ export function SidebarLayout() {
   return (
     <div className="flex flex-col h-screen bg-[#0b1121] text-foreground font-sans">
       <Navbar showLogo={true} onMenuClick={() => setSidebarOpen(true)} />
-      
+
       <div className="flex flex-1 overflow-hidden relative">
         {/* Mobile Backdrop */}
         {sidebarOpen && (
-          <div 
-            className="fixed inset-0 z-40 bg-black/50 md:hidden" 
-            onClick={() => setSidebarOpen(false)} 
+          <div
+            className="fixed inset-0 z-40 bg-black/50 md:hidden"
+            onClick={() => setSidebarOpen(false)}
           />
         )}
 
@@ -101,7 +104,9 @@ export function SidebarLayout() {
                   Unlock advanced insights and unlimited reports.
                 </p>
                 <button className="w-full flex items-center justify-center gap-1.5 rounded-md bg-[#2dd4bf] py-2 text-xs font-semibold text-slate-900 shadow-[0_0_15px_rgba(45,212,191,0.2)] hover:bg-[#20b2aa] transition-colors">
-                  <Zap className="h-3 w-3" /> Upgrade Now
+                  <a href="/pricing" className="w-full">
+                    <Zap className="h-3 w-3" /> Upgrade
+                  </a>
                 </button>
               </div>
             </div>

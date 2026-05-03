@@ -44,6 +44,15 @@ const TECH_DICTIONARY: Record<string, any> = {
   "radix-ui": { name: "Radix UI", category: "UI Components", desc: "Unstyled, accessible components for building design systems.", icon: Layers, color: "text-[#161618]", tab: "Frontend" },
   "eslint": { name: "ESLint", category: "Linter", desc: "Find and fix problems in your JavaScript code.", icon: Shield, color: "text-[#4B32C3]", tab: "DevOps & Config" },
   "docker": { name: "Docker", category: "DevOps", desc: "Empowering App Development for Developers.", icon: Cloud, color: "text-[#2496ED]", tab: "DevOps & Config" },
+  "flask": { name: "Flask", category: "Backend Framework", desc: "A lightweight WSGI web application framework.", icon: Zap, color: "text-white", tab: "Backend" },
+  "django": { name: "Django", category: "Backend Framework", desc: "A high-level Python web framework.", icon: Zap, color: "text-[#092E20]", tab: "Backend" },
+  "express": { name: "Express", category: "Backend Framework", desc: "Fast, unopinionated, minimalist web framework for Node.js.", icon: Zap, color: "text-white", tab: "Backend" },
+  "mongodb": { name: "MongoDB", category: "Database", desc: "NoSQL document database.", icon: Database, color: "text-[#47A248]", tab: "Database" },
+  "redis": { name: "Redis", category: "Database", desc: "In-memory data structure store.", icon: Database, color: "text-[#DC382D]", tab: "Database" },
+  "pymongo": { name: "PyMongo", category: "Database Driver", desc: "Python driver for MongoDB.", icon: Database, color: "text-[#47A248]", tab: "Database" },
+  "beautifulsoup4": { name: "BeautifulSoup", category: "Web Scraping", desc: "Python library for pulling data out of HTML and XML files.", icon: Box, color: "text-green-500", tab: "Tools & Libraries" },
+  "requests": { name: "Requests", category: "HTTP Library", desc: "Simple HTTP library for Python.", icon: Cloud, color: "text-[#3776AB]", tab: "Tools & Libraries" },
+  "pytest": { name: "Pytest", category: "Testing", desc: "Framework makes it easy to write small, readable tests.", icon: Shield, color: "text-[#0A9EDC]", tab: "Tools & Libraries" }
 };
 
 function getTechInfo(key: string) {
@@ -233,10 +242,31 @@ export function TechStack({ result }: { result?: any }) {
     return tech.tab === activeTab;
   });
 
-  const popularTechs = [
-    ...techData.languages.slice(0, 2).map(l => ({ id: l.id, name: l.name, percentage: l.percentage, color: l.color, icon: l.icon, originalId: l.originalId })),
-    ...techData.allTechs.filter(t => t.source !== 'dependency').slice(0, 3).map((t, i) => ({ id: t.id, name: t.name, percentage: Math.max(10, 80 - i * 15), color: t.color, icon: t.icon, originalId: t.originalId }))
-  ].slice(0, 5).sort((a, b) => b.percentage - a.percentage);
+  const popularTechs = useMemo(() => {
+    // If a specific tab is selected, show popular techs from that tab
+    const pool = activeTab === "All Technologies" 
+      ? [
+          ...techData.languages.slice(0, 2).map(l => ({ id: l.id, name: l.name, percentage: l.percentage, color: l.color, icon: l.icon, originalId: l.originalId })),
+          ...techData.allTechs.filter(t => t.source !== 'dependency').slice(0, 3).map((t, i) => ({ id: t.id, name: t.name, percentage: Math.max(10, 80 - i * 15), color: t.color, icon: t.icon, originalId: t.originalId }))
+        ]
+      : filteredTechs.map((t, i) => ({ id: t.id, name: t.name, percentage: Math.max(10, 80 - i * 12), color: t.color, icon: t.icon, originalId: t.originalId }));
+      
+    return pool.slice(0, 5).sort((a, b) => b.percentage - a.percentage);
+  }, [activeTab, techData, filteredTechs]);
+
+  const activeTabDesc = useMemo(() => {
+    switch (activeTab) {
+      case "Frontend": return "Technologies used to build the user interface and client-side experience.";
+      case "Backend": return "Server-side frameworks, APIs, and business logic technologies.";
+      case "Database": return "Database systems, ORMs, and data storage solutions used in this repository.";
+      case "Tools & Libraries": return "Third-party packages, utility libraries, and project tooling.";
+      case "DevOps & Config": return "Deployment, linting, formatting, and CI/CD configurations.";
+      default: return "A comprehensive overview of all technologies, frameworks, and libraries detected across the entire stack.";
+    }
+  }, [activeTab]);
+
+  const tabTechCount = filteredTechs.filter(t => t.source !== 'dependency').length;
+  const tabDepsCount = filteredTechs.filter(t => t.source === 'dependency').length;
 
   const TABS = [
     { id: "Frontend", icon: Code },
@@ -329,11 +359,11 @@ export function TechStack({ result }: { result?: any }) {
           <div className="rounded-xl border border-border/40 bg-surface/20 p-5">
             <div className="flex items-center gap-2 mb-4">
               <Settings className="h-4 w-4 text-primary" />
-              <h3 className="text-[11px] font-bold tracking-widest text-foreground uppercase">Overview</h3>
+              <h3 className="text-[11px] font-bold tracking-widest text-foreground uppercase">Overview ({activeTab})</h3>
               <Info className="h-3 w-3 text-muted-foreground ml-auto" />
             </div>
             <p className="text-[11px] text-muted-foreground mb-6 leading-relaxed">
-              Technologies used to build the user interface and client-side experience.
+              {activeTabDesc}
             </p>
 
             <div className="space-y-4">
@@ -341,25 +371,27 @@ export function TechStack({ result }: { result?: any }) {
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <Settings className="h-3.5 w-3.5" /> Technologies
                 </div>
-                <span className="font-semibold text-foreground">{techData.techCount}</span>
+                <span className="font-semibold text-foreground">{tabTechCount}</span>
               </div>
               <div className="flex items-center justify-between text-xs">
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <Layers className="h-3.5 w-3.5" /> Dependencies
                 </div>
-                <span className="font-semibold text-foreground">{techData.depsCount}</span>
+                <span className="font-semibold text-foreground">{tabDepsCount}</span>
               </div>
               <div className="flex items-center justify-between text-xs">
                 <div className="flex items-center gap-2 text-muted-foreground">
-                  <Terminal className="h-3.5 w-3.5" /> Lines of Code
+                  <Terminal className="h-3.5 w-3.5" /> Total Lines of Code
                 </div>
                 <span className="font-semibold text-foreground">{totalLoc.toLocaleString()}</span>
               </div>
               <div className="flex items-center justify-between text-xs">
                 <div className="flex items-center gap-2 text-muted-foreground">
-                  <Cpu className="h-3.5 w-3.5" /> Percentage
+                  <Cpu className="h-3.5 w-3.5" /> Percentage of Stack
                 </div>
-                <span className="font-semibold text-foreground">64%</span>
+                <span className="font-semibold text-foreground">
+                  {techData.allTechs.length > 0 ? Math.round((filteredTechs.length / techData.allTechs.length) * 100) : 0}%
+                </span>
               </div>
             </div>
           </div>
@@ -368,33 +400,37 @@ export function TechStack({ result }: { result?: any }) {
           <div className="rounded-xl border border-border/40 bg-surface/20 p-5">
             <div className="flex items-center gap-2 mb-6">
               <Flame className="h-4 w-4 text-primary" />
-              <h3 className="text-[11px] font-bold tracking-widest text-foreground uppercase">Popular Technologies</h3>
+              <h3 className="text-[11px] font-bold tracking-widest text-foreground uppercase">Top in {activeTab === 'All Technologies' ? 'Stack' : activeTab}</h3>
             </div>
 
-            <div className="space-y-5">
-              {popularTechs.map((tech, idx) => {
-                return (
-                  <div key={idx} className="space-y-1.5">
-                    <div className="flex items-center justify-between text-xs">
-                      <div className="flex items-center gap-2 text-foreground font-medium">
-                        <TechIcon techId={tech.id} fallbackIcon={tech.icon} originalId={tech.originalId} className="h-3.5 w-3.5 opacity-90" />
-                        {tech.name}
+            {popularTechs.length === 0 ? (
+              <div className="text-xs text-muted-foreground text-center py-4">No data available</div>
+            ) : (
+              <div className="space-y-5">
+                {popularTechs.map((tech, idx) => {
+                  return (
+                    <div key={idx} className="space-y-1.5">
+                      <div className="flex items-center justify-between text-xs">
+                        <div className="flex items-center gap-2 text-foreground font-medium">
+                          <TechIcon techId={tech.id} fallbackIcon={tech.icon} originalId={tech.originalId} className="h-3.5 w-3.5 opacity-90" />
+                          {tech.name}
+                        </div>
+                        <span className="font-mono text-muted-foreground">{tech.percentage}%</span>
                       </div>
-                      <span className="font-mono text-muted-foreground">{tech.percentage}%</span>
+                      <div className="h-1.5 w-full bg-surface-2 rounded-full overflow-hidden">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: `${tech.percentage}%` }}
+                          transition={{ duration: 1, delay: idx * 0.1 }}
+                          className={`h-full ${tech.color.replace('text-', 'bg-')}`}
+                          style={{ backgroundColor: tech.color.includes('[') ? tech.color.match(/\[(.*?)\]/)?.[1] : 'var(--primary)' }}
+                        />
+                      </div>
                     </div>
-                    <div className="h-1.5 w-full bg-surface-2 rounded-full overflow-hidden">
-                      <motion.div
-                        initial={{ width: 0 }}
-                        animate={{ width: `${tech.percentage}%` }}
-                        transition={{ duration: 1, delay: idx * 0.1 }}
-                        className={`h-full ${tech.color.replace('text-', 'bg-')}`}
-                        style={{ backgroundColor: tech.color.includes('[') ? tech.color.match(/\[(.*?)\]/)?.[1] : 'var(--primary)' }}
-                      />
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
+                  )
+                })}
+              </div>
+            )}
           </div>
         </div>
 

@@ -77,7 +77,8 @@ const Logo = () => (
 );
 
 import { Navbar } from "@/components/layout/Navbar";
-import Landing from "./Landing";
+import Landing, { FAQSection } from "./Landing";
+import { FeaturesSection } from "./FeaturesPage";
 
 const HeroDashboard = () => (
   <div className="relative">
@@ -288,7 +289,7 @@ const Hero = () => {
           </div>
           <div className="mt-3 text-center text-xs text-muted-foreground inline-flex items-center gap-2 w-full justify-center">
             <span className="h-1.5 w-1.5 rounded-full bg-primary blink shadow-[0_0_6px_hsl(var(--primary))]" />
-            No signup required • Results in seconds
+            Just enter the repo URL • Results in seconds
           </div>
         </Reveal>
 
@@ -706,11 +707,14 @@ const Index = () => {
       <TrustBar />
 
 
-      <Features />
+
+      {/* Replacing old Features with the new FeaturesSection */}
+      <FeaturesSection />
       <HowItWorks />
       <Testimonials />
       {/* <Feedback />
       <FinalCTA /> */}
+      <FAQSection />
       <Footer />
     </main>
   );
