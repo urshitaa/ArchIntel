@@ -2,13 +2,11 @@ import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Sparkles,
   Bell,
   Settings,
   LogOut,
   Zap,
   ArrowRight,
-  Code2,
   Menu,
   X,
 } from "lucide-react";
@@ -35,11 +33,13 @@ export function Navbar({
   isLanding = false,
   scrolled = false,
   onMenuClick,
+  credits = 0,
 }: {
   showLogo?: boolean;
   isLanding?: boolean;
   scrolled?: boolean;
   onMenuClick?: () => void;
+  credits?: number;
 }) {
   const { user, signOut } = useAuth();
 
@@ -126,8 +126,8 @@ export function Navbar({
                   key={l.href}
                   to={l.href}
                   className={`rounded-lg px-4 py-2 text-sm transition-colors whitespace-nowrap ${isActive
-                      ? "text-foreground font-medium underline decoration-primary decoration-2 underline-offset-[6px]"
-                      : "text-muted-foreground hover:bg-surface-2 hover:text-foreground"
+                    ? "text-foreground font-medium underline decoration-primary decoration-2 underline-offset-[6px]"
+                    : "text-muted-foreground hover:bg-surface-2 hover:text-foreground"
                     }`}
                 >
                   {l.label}
@@ -144,7 +144,7 @@ export function Navbar({
                   <Zap className="h-3 w-3 text-primary" />
                   <span>
                     <b className="text-foreground">
-                      42
+                      {credits}
                     </b>{" "}
                     credits
                   </span>
@@ -206,49 +206,51 @@ export function Navbar({
             )}
           </div>
         </div>
-      </motion.header>
+      </motion.header >
 
       {/* Mobile Menu */}
       <AnimatePresence>
-        {mobileMenuOpen && !onMenuClick && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{
-              opacity: 1,
-              height: "auto",
-            }}
-            exit={{ opacity: 0, height: 0 }}
-            className="fixed inset-x-0 top-[72px] z-30 overflow-hidden bg-background/95 backdrop-blur-xl border-b border-border md:hidden"
-          >
-            <div className="p-4 flex flex-col gap-2">
-              {activeLinks.map((l) => {
-                const isActive =
-                  location.pathname === l.href ||
-                  (l.href !== "/" &&
-                    location.pathname.startsWith(
-                      l.href
-                    ));
+        {
+          mobileMenuOpen && !onMenuClick && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{
+                opacity: 1,
+                height: "auto",
+              }}
+              exit={{ opacity: 0, height: 0 }}
+              className="fixed inset-x-0 top-[72px] z-30 overflow-hidden bg-background/95 backdrop-blur-xl border-b border-border md:hidden"
+            >
+              <div className="p-4 flex flex-col gap-2">
+                {activeLinks.map((l) => {
+                  const isActive =
+                    location.pathname === l.href ||
+                    (l.href !== "/" &&
+                      location.pathname.startsWith(
+                        l.href
+                      ));
 
-                return (
-                  <Link
-                    key={l.href}
-                    to={l.href}
-                    onClick={() =>
-                      setMobileMenuOpen(false)
-                    }
-                    className={`rounded-lg px-4 py-3 text-base font-medium transition-colors ${isActive
+                  return (
+                    <Link
+                      key={l.href}
+                      to={l.href}
+                      onClick={() =>
+                        setMobileMenuOpen(false)
+                      }
+                      className={`rounded-lg px-4 py-3 text-base font-medium transition-colors ${isActive
                         ? "text-foreground underline decoration-primary decoration-2 underline-offset-[6px]"
                         : "text-muted-foreground hover:bg-surface-2 hover:text-foreground"
-                      }`}
-                  >
-                    {l.label}
-                  </Link>
-                );
-              })}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+                        }`}
+                    >
+                      {l.label}
+                    </Link>
+                  );
+                })}
+              </div>
+            </motion.div>
+          )
+        }
+      </AnimatePresence >
     </>
   );
 }

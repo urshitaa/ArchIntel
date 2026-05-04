@@ -30,7 +30,7 @@ const STEPS: PipelineStep[] = [
     id: "validate",
     label: "Validating repository",
     icon: Github,
-    duration: 450,
+    duration: 1350,
     logs: [
       "GET https://api.github.com/repos/{repo}",
       "→ 200 OK · public · default branch=main",
@@ -41,7 +41,7 @@ const STEPS: PipelineStep[] = [
     id: "meta",
     label: "Fetching GitHub metadata",
     icon: Database,
-    duration: 600,
+    duration: 1800,
     logs: [
       "stars=124,302  forks=26,841  watchers=1,284",
       "license=MIT  contributors=3,142",
@@ -52,7 +52,7 @@ const STEPS: PipelineStep[] = [
     id: "tree",
     label: "Parsing repository tree",
     icon: FileCode,
-    duration: 700,
+    duration: 2100,
     logs: [
       "walking 1,284 files across 187 directories…",
       "languages: ts(64%) js(18%) css(9%) mdx(6%) other(3%)",
@@ -63,7 +63,7 @@ const STEPS: PipelineStep[] = [
     id: "frameworks",
     label: "Detecting frameworks",
     icon: Cpu,
-    duration: 500,
+    duration: 1500,
     logs: [
       "signature scan: react@18 · next@15 · tailwind@3",
       "tooling: eslint · prettier · vitest · swc",
@@ -74,7 +74,7 @@ const STEPS: PipelineStep[] = [
     id: "graph",
     label: "Building dependency graph",
     icon: Network,
-    duration: 800,
+    duration: 2400,
     logs: [
       "resolving import edges (esm + cjs)…",
       "1,284 nodes · 4,217 edges · 12 clusters",
@@ -85,7 +85,7 @@ const STEPS: PipelineStep[] = [
     id: "arch",
     label: "Scanning architecture",
     icon: Layers,
-    duration: 600,
+    duration: 1800,
     logs: [
       "layers: ui · routes · services · data",
       "patterns: app-router · server components · edge",
@@ -96,7 +96,7 @@ const STEPS: PipelineStep[] = [
     id: "apis",
     label: "Extracting APIs & routes",
     icon: Workflow,
-    duration: 500,
+    duration: 1500,
     logs: [
       "found 38 routes · 12 server actions · 4 middlewares",
       "✓ api surface mapped",
@@ -106,7 +106,7 @@ const STEPS: PipelineStep[] = [
     id: "embed",
     label: "Generating embeddings",
     icon: Boxes,
-    duration: 750,
+    duration: 2250,
     logs: [
       "chunking 1,284 files → 18,420 chunks",
       "embedding · model=text-embed-3-large · dim=3072",
@@ -117,7 +117,7 @@ const STEPS: PipelineStep[] = [
     id: "summary",
     label: "Creating AI summaries",
     icon: Sparkles,
-    duration: 700,
+    duration: 2100,
     logs: [
       "summarizing modules · streaming…",
       "drafting 4 explanation styles per file",
@@ -128,7 +128,7 @@ const STEPS: PipelineStep[] = [
     id: "ws",
     label: "Preparing workspace",
     icon: ShieldCheck,
-    duration: 400,
+    duration: 1200,
     logs: ["assembling panels · pre-warming graph", "✓ workspace ready"],
   },
 ];

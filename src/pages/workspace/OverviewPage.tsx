@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
 import { FileCode, Boxes } from "lucide-react";
 import { Panel, Badge, KV } from "@/components/workspace/Shared";
@@ -75,7 +75,7 @@ export function OverviewPage() {
             Module Detail
           </h2>
           <div className="rounded-xl border border-white/5 bg-[#0f172a] p-5 h-[calc(100%-2rem)]">
-            <FileDetail node={selected} />
+            <FileDetail node={selected} repoUrl={analysisResult?.repository?.html_url || `https://github.com/${analysisResult?.repository?.full_name || analysisResult?.repository?.name || 'unknown/unknown'}`} />
           </div>
         </div>
       </div>
@@ -83,8 +83,36 @@ export function OverviewPage() {
   );
 }
 
-function FileDetail({ node }: { node: any | null }) {
+function FileDetail({ node, repoUrl }: { node: any | null, repoUrl?: string }) {
   const [tab, setTab] = useState<"summary" | "deps" | "dependents" | "code">("summary");
+  const [summary, setSummary] = useState(node?.summary);
+  const [loadingSummary, setLoadingSummary] = useState(false);
+
+  useEffect(() => {
+    setSummary(node?.summary);
+    if (node && node.type === "file") {
+      const fetchSummary = async () => {
+        setLoadingSummary(true);
+        try {
+          const res = await fetch("http://localhost:8000/api/v1/analysis/file-summary", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ file_path: node.path, repo_url: repoUrl || "https://github.com/unknown/unknown" }),
+          });
+          const data = await res.json();
+          if (data && data.summary) {
+            setSummary(data.summary);
+          }
+        } catch (e) {
+          console.error("Failed to fetch summary", e);
+        } finally {
+          setLoadingSummary(false);
+        }
+      };
+      fetchSummary();
+    }
+  }, [node?.path, repoUrl]);
+
   if (!node || node.type === "folder")
     return (
       <div className="flex h-[260px] items-center justify-center text-xs text-muted-foreground">
@@ -134,7 +162,14 @@ function FileDetail({ node }: { node: any | null }) {
       <div className="mt-3 min-h-[400px]">
         {tab === "summary" && (
           <div>
-            <p className="text-[12.5px] leading-relaxed text-muted-foreground">{node.summary}</p>
+            {loadingSummary ? (
+              <div className="flex items-center gap-2 text-[12.5px] text-muted-foreground">
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                Generating AI summary...
+              </div>
+            ) : (
+              <p className="text-[12.5px] leading-relaxed text-muted-foreground whitespace-pre-wrap">{summary}</p>
+            )}
             <div className="mt-3 grid grid-cols-2 gap-2">
               <KV k="Exports" v={node.exports?.join(", ") || "—"} />
               <KV k="Imports" v={node.imports?.join(", ") || "—"} />

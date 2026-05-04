@@ -27,9 +27,9 @@ import { CountUp } from "@/components/landing/CountUp";
 import { Reveal } from "@/components/landing/Reveal";
 import { WordReveal } from "@/components/landing/WordReveal";
 import { MagneticButton } from "@/components/landing/MagneticButton";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-
+import logoImg from "../assets/logo.png";
 
 
 const features = [
@@ -48,9 +48,48 @@ const steps = [
 ];
 
 const testimonials = [
-  { quote: "Saved me hours understanding legacy repos.", name: "Maya Chen", role: "Senior Engineer, Plaid" },
-  { quote: "Architecture diagrams are insanely helpful.", name: "Daniel Okafor", role: "Tech Lead, Linear" },
-  { quote: "Best onboarding tool for engineers.", name: "Priya Raman", role: "EM, Vercel" },
+  {
+    quote: "ArchIntel is like having a senior engineer constantly by your side. It instantly breaks down complex legacy repos into understandable, interactive diagrams. It saved us weeks during our last major refactor.",
+    name: "Alex Rivera",
+    role: "Lead Architect at TechFlow",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Alex&backgroundColor=transparent",
+    handle: "@arivera_dev"
+  },
+  {
+    quote: "I've tried many code analysis tools, but the visual dependency graph and AI-powered step-by-step breakdowns here are unmatched. It completely transformed our onboarding process.",
+    name: "Samantha Lee",
+    role: "Engineering Manager at Vercel",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sam&backgroundColor=transparent",
+    handle: "@samlee_codes"
+  },
+  {
+    quote: "The deep architecture insights provided by this platform allowed us to identify three critical bottlenecks in our microservices that we had been missing for months. Absolutely indispensable.",
+    name: "David Chen",
+    role: "Senior Backend Engineer",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=David&backgroundColor=transparent",
+    handle: "@dchen_backend"
+  },
+  {
+    quote: "Security scanning built into the architectural overview? Yes please. It highlighted exposed secrets and risky patterns before they ever made it to production.",
+    name: "Elena Rostova",
+    role: "DevSecOps Lead at FinTech Inc.",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Elena&backgroundColor=transparent",
+    handle: "@erostova_sec"
+  },
+  {
+    quote: "As a frontend developer diving into a massive monolithic backend for the first time, ArchIntel's interactive mapping made what would have been a terrifying task actually enjoyable.",
+    name: "Marcus Johnson",
+    role: "Full Stack Developer",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Marcus&backgroundColor=transparent",
+    handle: "@marcusj_web"
+  },
+  {
+    quote: "The ability to just drop a GitHub URL and get a complete, understandable architecture report in seconds feels like magic. Best developer tool I've used this year.",
+    name: "Chloe Smith",
+    role: "CTO at StartupX",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Chloe&backgroundColor=transparent",
+    handle: "@chloe_tech"
+  }
 ];
 
 const feedbackTicker = [
@@ -65,20 +104,24 @@ const feedbackTicker = [
 const logos = ["Vercel", "Supabase", "Next.js", "Tailwind CSS", "shadcn/ui", "GitHub"];
 
 const Logo = () => (
-  <a href="#" className="group flex items-center gap-2.5">
-    <span className="relative grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-primary/30 to-primary/5 neon-border">
-      <span className="absolute inset-0 rounded-xl blur-md bg-primary/30 group-hover:bg-primary/50 transition-colors" />
-      <Code2 className="relative h-4.5 w-4.5 text-primary" strokeWidth={2.4} />
-    </span>
-    <span className="font-semibold tracking-tight text-[15px]">
-      CodeBase<span className="text-primary"> Explainer</span>
-    </span>
-  </a>
+  <Link to="/" >
+    <img src={logoImg} alt="Logo" className="  h-8 w-36 object-fit" />
+  </Link>
+  // <a href="#" className="group flex items-center gap-2.5">
+  //   <span className="relative grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-primary/30 to-primary/5 neon-border">
+  //     <span className="absolute inset-0 rounded-xl blur-md bg-primary/30 group-hover:bg-primary/50 transition-colors" />
+  //     <Code2 className="relative h-4.5 w-4.5 text-primary" strokeWidth={2.4} />
+  //   </span>
+  //   <span className="font-semibold tracking-tight text-[15px]">
+  //     <span className="text-primary"> </span>
+  //   </span>
+  // </a>
 );
 
 import { Navbar } from "@/components/layout/Navbar";
 import Landing, { FAQSection } from "./Landing";
 import { FeaturesSection } from "./FeaturesPage";
+
 
 const HeroDashboard = () => (
   <div className="relative">
@@ -393,6 +436,142 @@ export const Features = () => (
   </section>
 );
 
+
+import { Rocket, Users, Check, Hexagon } from "lucide-react";
+
+const plans = [
+  {
+    name: "FREE",
+    price: "0",
+    period: "Forever",
+    icon: Rocket,
+    features: [
+      "3 Public Repos / month",
+      "Explain up to 5 files",
+      "Basic Code Explanations",
+      "Community Support",
+    ],
+    buttonClass: "border border-primary text-primary bg-transparent hover:bg-primary/10",
+  },
+  {
+    name: "PRO",
+    price: "9",
+    period: "/month",
+    billed: "Billed monthly",
+    icon: Zap,
+    popular: true,
+    features: [
+      "Unlimited Public Repos",
+      "Explain up to 50 files",
+      "Advanced Explanations",
+      "Diagrams & Visuals",
+      "Priority Support",
+    ],
+    buttonClass: "bg-primary text-primary-foreground hover:brightness-110",
+  },
+  {
+    name: "TEAM",
+    price: "29",
+    period: "/month",
+    billed: "Billed monthly",
+    icon: Users,
+    features: [
+      "Everything in Pro",
+      "Unlimited Private Repos",
+      "Explain up to 500 files",
+      "Team Workspaces",
+      "Priority Support",
+    ],
+    buttonClass: "border border-primary text-primary bg-transparent hover:bg-primary/10",
+  },
+];
+
+export function Pricing() {
+  return (
+    <main className="min-h-screen bg-background flex flex-col font-sans">
+
+
+      <div className="flex-1 container py-24 flex flex-col items-center">
+        {/* Header */}
+        <div className="text-center mb-16 space-y-4">
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground">
+            Powerful plans for <span className="text-primary">every developer</span>
+          </h1>
+          <p className="text-lg text-muted-foreground">
+            Explain more. Understand better. Ship faster.
+          </p>
+        </div>
+
+        {/* Pricing Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl px-4">
+          {plans.map((plan) => (
+            <div
+              key={plan.name}
+              className={`relative flex flex-col items-center rounded-3xl p-8 bg-[#0a111a]/80 backdrop-blur-sm border ${plan.popular
+                ? "border-primary shadow-[0_0_30px_hsl(var(--primary)/0.15)] md:-translate-y-2 z-10"
+                : "border-border/50"
+                }`}
+            >
+              {plan.popular && (
+                <div className="absolute top-0 right-0 overflow-hidden w-28 h-28 rounded-tr-3xl">
+                  <div className="absolute top-6 -right-7 bg-primary text-primary-foreground text-[10px] font-bold py-1.5 px-10 transform rotate-45 text-center shadow-lg uppercase tracking-wider">
+                    Most Popular
+                  </div>
+                </div>
+              )}
+
+              {/* Icon */}
+              <div className="relative flex items-center justify-center w-20 h-20 mb-6 text-primary">
+                <Hexagon className={`absolute inset-0 w-20 h-20 ${plan.popular ? 'fill-primary/10 stroke-primary stroke-[1.5]' : 'stroke-primary stroke-[1.5]'}`} />
+                <plan.icon className={`relative z-10 w-8 h-8 ${plan.popular ? 'fill-primary' : ''}`} />
+              </div>
+
+              {/* Title & Price */}
+              <h3 className="text-lg font-bold text-primary tracking-wide mb-4 uppercase">
+                {plan.name}
+              </h3>
+              <div className="flex items-baseline justify-center gap-1 mb-1">
+                <span className="text-5xl font-extrabold text-foreground">${plan.price}</span>
+                {plan.period !== "Forever" && (
+                  <span className="text-muted-foreground text-sm font-medium">{plan.period}</span>
+                )}
+              </div>
+              <div className="h-6 mb-8 text-sm text-muted-foreground/80 font-medium">
+                {plan.billed || plan.period}
+              </div>
+
+              {/* Divider */}
+              <div className="w-full h-px bg-border/40 mb-8" />
+
+              {/* Features */}
+              <ul className="w-full space-y-4 mb-10 flex-1">
+                {plan.features.map((feature) => (
+                  <li key={feature} className="flex items-center gap-3 text-[15px] text-muted-foreground/90">
+                    <Check className="w-4 h-4 text-primary shrink-0 stroke-[3]" />
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+
+              {/* Button */}
+              <button
+                title="Coming soon!"
+                className={`w-full py-3.5 rounded-xl font-semibold transition-all duration-300 cursor-not-allowed opacity-90 ${plan.buttonClass}`}
+              >
+                Get Started
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+
+
+    </main>
+  );
+}
+
+
+
 export const HowItWorks = () => {
   const customSteps = [
     {
@@ -491,43 +670,95 @@ export const HowItWorks = () => {
     </section>
   );
 };
-
-export const Testimonials = () => (
-  <section id="insights" className="py-24 relative">
-    <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
-    <div className="container">
-      <Reveal>
-        <h2 className="text-center text-4xl md:text-5xl font-bold tracking-tight">
-          Loved by <span className="text-gradient">Developers</span>
-        </h2>
-      </Reveal>
-      <div className="mt-14 grid grid-cols-1 md:grid-cols-3 gap-5">
-        {testimonials.map((t, i) => (
-          <Reveal key={i} delay={i * 120}>
-            <div className="group relative glass neon-border rounded-2xl p-6 float-y" style={{ animationDelay: `${i * 0.6}s` }}>
-              <div className="absolute -inset-px rounded-2xl bg-primary/10 blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
-              <div className="relative">
-                <div className="flex gap-0.5 text-primary">
-                  {Array.from({ length: 5 }).map((_, j) => (
-                    <Star key={j} className="h-4 w-4 fill-primary" />
-                  ))}
-                </div>
-                <p className="mt-4 text-base leading-relaxed">{t.quote}</p>
-                <div className="mt-5 flex items-center gap-3">
-                  <div className="h-9 w-9 rounded-full bg-gradient-to-br from-primary to-primary-glow" />
-                  <div>
-                    <div className="text-sm font-medium">{t.name}</div>
-                    <div className="text-xs text-muted-foreground">{t.role}</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </Reveal>
+const TestimonialCard = ({ t, idx }: { t: any, idx: number }) => (
+  <div className="relative group glass neon-border rounded-2xl p-7 transition-all duration-300 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-primary/20 bg-[#0a111a]/80 backdrop-blur-md">
+    <div className="absolute -inset-px rounded-2xl bg-gradient-to-b from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+    <div className="relative z-10">
+      <div className="flex gap-1 text-primary mb-6">
+        {Array.from({ length: 5 }).map((_, j) => (
+          <Star key={j} className="h-4 w-4 fill-primary stroke-primary" />
         ))}
       </div>
+      <p className="text-[15px] leading-relaxed text-foreground/90 mb-8 font-medium">
+        "{t.quote}"
+      </p>
+      <div className="flex items-center gap-4 pt-4 border-t border-border/40">
+        <div className="relative h-11 w-11 rounded-full overflow-hidden border border-primary/30 bg-primary/10 flex-shrink-0">
+          <img src={t.avatar} alt={t.name} className="h-full w-full object-cover" />
+        </div>
+        <div className="flex flex-col">
+          <div className="text-sm font-bold text-foreground flex items-center gap-1.5">
+            {t.name}
+            <span className="text-[11px] font-normal text-muted-foreground/80">{t.handle}</span>
+          </div>
+          <div className="text-xs text-primary/80 font-medium mt-0.5">{t.role}</div>
+        </div>
+      </div>
     </div>
-  </section>
+  </div>
 );
+
+export const Testimonials = () => {
+  const col1 = testimonials.slice(0, 2);
+  const col2 = testimonials.slice(2, 4);
+  const col3 = testimonials.slice(4, 6);
+
+  // Repeat enough times to ensure the container is tall enough for seamless -50% translation
+  const rep1 = [...col1, ...col1, ...col1, ...col1];
+  const rep2 = [...col2, ...col2, ...col2, ...col2];
+  const rep3 = [...col3, ...col3, ...col3, ...col3];
+
+  return (
+    <section id="testimonials" className="py-24 relative overflow-hidden">
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/10 blur-[120px] rounded-full pointer-events-none" />
+      
+      <div className="container relative z-10">
+        <Reveal>
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-6">
+              Loved by <span className="text-primary">Engineers</span> Worldwide
+            </h2>
+            <p className="text-lg text-muted-foreground">
+              See how top development teams are using ArchIntel to understand, document, and scale their codebases faster than ever before.
+            </p>
+          </div>
+        </Reveal>
+        
+        <div 
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 h-[700px] overflow-hidden relative"
+          style={{
+            maskImage: "linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)",
+            WebkitMaskImage: "linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)"
+          }}
+        >
+          {/* Column 1 (Scroll Down) */}
+          <div className="flex flex-col gap-6 ticker-down hover:[animation-play-state:paused]">
+            {rep1.map((t, i) => (
+               <TestimonialCard key={`c1-${i}`} t={t} idx={i} />
+            ))}
+          </div>
+          
+          {/* Column 2 (Scroll Up) */}
+          <div className="hidden md:flex flex-col gap-6 ticker-up hover:[animation-play-state:paused]">
+            {rep2.map((t, i) => (
+               <TestimonialCard key={`c2-${i}`} t={t} idx={i} />
+            ))}
+          </div>
+          
+          {/* Column 3 (Scroll Down) */}
+          <div className="hidden lg:flex flex-col gap-6 ticker-down hover:[animation-play-state:paused]">
+            {rep3.map((t, i) => (
+               <TestimonialCard key={`c3-${i}`} t={t} idx={i} />
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+
 
 const SatisfactionMeter = () => {
   const target = 4.9;
@@ -684,7 +915,7 @@ export const Footer = () => (
 
     <div className="border-t border-border/60">
       <div className="container py-5 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-muted-foreground">
-        <span>© 2026 CodeBase Explainer • Built with love for developers</span>
+        <span>© 2026 RepoGPT</span>
         <span className="font-mono">v1.0.0 • status: <span className="text-primary">all systems operational</span></span>
       </div>
     </div>
@@ -710,11 +941,15 @@ const Index = () => {
 
       {/* Replacing old Features with the new FeaturesSection */}
       <FeaturesSection />
+
       <HowItWorks />
-      <Testimonials />
+
+
       {/* <Feedback />
       <FinalCTA /> */}
+      <Pricing />
       <FAQSection />
+      <Testimonials />
       <Footer />
     </main>
   );

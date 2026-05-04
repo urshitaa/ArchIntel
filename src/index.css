@@ -195,7 +195,11 @@
   }
 
   .ticker-up {
-    animation: ticker-up 22s linear infinite;
+    animation: ticker-up 30s linear infinite;
+  }
+
+  .ticker-down {
+    animation: ticker-down 30s linear infinite;
   }
 
   .draw-line {
@@ -257,6 +261,16 @@
 
   100% {
     transform: translateY(-50%);
+  }
+}
+
+@keyframes ticker-down {
+  0% {
+    transform: translateY(-50%);
+  }
+
+  100% {
+    transform: translateY(0);
   }
 }
 

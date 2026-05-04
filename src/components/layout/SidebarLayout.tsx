@@ -22,7 +22,7 @@ import { Navbar } from "@/components/layout/Navbar";
 
 const SIDEBAR_NAV = [
   { label: "Dashboard", href: "dashboard", icon: LayoutDashboard },
-  { label: "Overview", href: "overview", icon: Presentation },
+  { label: "File Structure", href: "overview", icon: Presentation },
   { label: "Ask AI", href: "analytics", icon: Bot },
   { label: "Dependencies (Graphs)", href: "dependencies", icon: Users },
   { label: "Architecture", href: "architecture", icon: Layers },
