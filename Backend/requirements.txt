@@ -19,7 +19,7 @@ sse-starlette
 python-multipart
 # groq
 loguru
-uvicorn  
+
 tenacity
 
 orjson
