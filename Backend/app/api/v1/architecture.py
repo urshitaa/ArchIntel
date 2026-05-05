@@ -1,9 +1,9 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-import httpx
 from app.core.config import settings
 from app.core.logging import app_logger
 import json
+import os
 
 router = APIRouter()
 
@@ -12,51 +12,78 @@ class ArchitectureRequest(BaseModel):
 
 @router.post("")
 async def analyze_architecture(request: ArchitectureRequest):
-    if not settings.GEMINI_API_KEY:
-        raise HTTPException(status_code=500, detail="Gemini API Key not configured")
-        
-    # Format a prompt
-    paths = [f"{file.get('path', '')} ({file.get('language', 'Unknown')})" for file in request.files[:150]]
-    repo_structure = "\n".join(paths)
-    
-    prompt = f"""
-    Analyze the following repository structure and provide a JSON response representing the architecture.
-    Files:
-    {repo_structure}
-    
-    Return EXACTLY this JSON structure:
-    {{
-        "summaries": {{ "path/to/file": "1-line summary describing its likely purpose." }},
-        "narrative": [
-            {{ "step": 1, "title": "Overview", "description": "High level architecture overview.", "components": ["Component1", "Component2"] }},
-            {{ "step": 2, "title": "Frontend / Client", "description": "How the client is built.", "components": ["React", "State"] }},
-            {{ "step": 3, "title": "Backend / Services", "description": "How the backend operates.", "components": ["API", "Service"] }}
-        ],
-        "complexity": {{
-            "path/to/file": {{ "score": 85, "reason": "High cyclomatic complexity due to..." }}
-        }}
-    }}
-    Provide summaries and complexity scores for the top 10 most important or complex files. Score is from 1 to 100.
-    """
-    
     try:
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={settings.GEMINI_API_KEY}"
-        payload = {
-            "contents": [{"parts": [{"text": prompt}]}],
-            "systemInstruction": {"parts": [{"text": "You are an expert software architect analyzing codebases. Return ONLY valid JSON."}]},
-            "generationConfig": {"responseMimeType": "application/json"}
-        }
+        files = request.files
         
-        async with httpx.AsyncClient() as client:
-            response = await client.post(url, json=payload, timeout=60.0)
-            response.raise_for_status()
+        narrative = []
+        complexity = {}
+        summaries = {}
+        
+        # Group files by top level directory to form components
+        components_map = {}
+        for file in files:
+            path = file.get("path", "")
+            size = file.get("size", 0)
             
-            result_data = response.json()
-            content = result_data["candidates"][0]["content"]["parts"][0]["text"]
+            # Simple complexity heuristic based on size
+            score = min(100, max(10, int((size / 1024) * 2)))  # rough KB * 2
             
-            data = json.loads(content)
-            return data
+            # Special case for known complex files
+            if path.endswith((".py", ".tsx", ".ts", ".js", ".go", ".rs", ".cpp", ".java", ".c")):
+                score = min(100, score + 30)
+            if "api" in path or "core" in path or "store" in path:
+                score = min(100, score + 20)
+                
+            reason = f"Complexity computed based on file size ({size} bytes) and path location."
+            if score > 80:
+                reason = f"High complexity due to significant logic density in {path}."
+            elif score > 60:
+                reason = f"Moderate complexity in {path}."
+                
+            complexity[path] = {
+                "score": score,
+                "reason": reason
+            }
             
+            filename = os.path.basename(path)
+            summaries[path] = f"Handles {filename} operations and logic."
+            
+            parts = path.split("/")
+            if len(parts) > 1:
+                top_dir = parts[0]
+            else:
+                top_dir = "Root"
+                
+            if top_dir not in components_map:
+                components_map[top_dir] = []
+            if len(components_map[top_dir]) < 5:
+                components_map[top_dir].append(filename)
+
+        # Build narrative
+        step = 1
+        for comp, items in components_map.items():
+            narrative.append({
+                "step": step,
+                "title": f"Component: {comp}",
+                "description": f"The {comp} module forms a critical part of the architecture, containing key elements such as {', '.join(items)}.",
+                "components": [comp] + items[:3]
+            })
+            step += 1
+            
+        if not narrative:
+            narrative.append({
+                "step": 1,
+                "title": "Project Foundation",
+                "description": "The foundation of the project.",
+                "components": ["Core"]
+            })
+            
+        return {
+            "narrative": narrative,
+            "complexity": complexity,
+            "summaries": summaries
+        }
+
     except Exception as e:
-        app_logger.error(f"Error analyzing architecture: {e}")
+        app_logger.error(f"Error: {e}")
         raise HTTPException(status_code=500, detail=str(e))

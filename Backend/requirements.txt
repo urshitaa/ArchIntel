@@ -17,9 +17,9 @@ aiofiles
 sse-starlette
 
 python-multipart
-openai
+# groq
 loguru
-
+       
 tenacity
 
 orjson

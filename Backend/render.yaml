@@ -24,7 +24,7 @@ services:
       - key: MONGODB_DB
         sync: false
 
-      - key: OPENAI_API_KEY
+      - key: GEMINI_API_KEY
         sync: false
 
       - key: ANTHROPIC_API_KEY
@@ -63,5 +63,5 @@ services:
       - key: MONGODB_DB
         sync: false
 
-      - key: OPENAI_API_KEY
+      - key: GEMINI_API_KEY
         sync: false

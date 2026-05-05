@@ -38,7 +38,7 @@ api_router.include_router(
     prefix="/chat",
     tags=["Chat"]
 )
-
+ 
 api_router.include_router(
     architecture_router,
     prefix="/repositories/architecture",

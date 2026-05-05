@@ -55,7 +55,7 @@ export function DashboardPage() {
       body: JSON.stringify({ repo_url: repoUrl }),
     }).then(res => {
       setAnalysisResult(res);
-      
+
       try {
         const repo = res.repository;
         if (repo) {

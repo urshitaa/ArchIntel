@@ -1,42 +1,7 @@
-# from functools import lru_cache
-# from typing import List
-# from pydantic import Field
-# from pydantic_settings import BaseSettings, SettingsConfigDict
-
-
-
-# class Settings(BaseSettings):
-#     CORS_ORIGINS: str = ""
-
-#     class Config:
-#         env_file = ".env"
-#         case_sensitive = True
-
-#     @property
-#     def cors_origins_list(self) -> List[str]:
-#         if not self.CORS_ORIGINS:
-#             return []
-
-#         return [
-#             origin.strip()
-#             for origin in self.CORS_ORIGINS.split(",")
-#             if origin.strip()
-#         ]
-
-
-# @lru_cache
-# def get_settings():
-#     return Settings()
-
-
-# settings = get_settings()
-
 from functools import lru_cache
 from typing import List
-
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
-
 
 class Settings(BaseSettings):
     APP_NAME: str = "ArchIntel API"
@@ -55,10 +20,8 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str = "HS256"
     JWT_EXPIRE_MINUTES: int = 1440
 
-    OPENAI_API_KEY: str | None = None
+    # GROQ_API_KEY: str | None = None
     GEMINI_API_KEY: str | None = None
-    ANTHROPIC_API_KEY: str | None = None
-    DEEPSEEK_API_KEY: str | None = None
     GITHUB_TOKEN: str | None = None
 
     CORS_ORIGINS: str = "http://localhost:8080"

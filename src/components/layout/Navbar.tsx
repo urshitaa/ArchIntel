@@ -117,6 +117,7 @@ export function Navbar({
               : landingNavLinks
             ).map((l) => {
               const isActive =
+                (l.label === "Dashboard" && location.pathname.startsWith("/workspace")) ||
                 location.pathname === l.href ||
                 (l.href !== "/" &&
                   location.pathname.startsWith(l.href));
@@ -224,6 +225,7 @@ export function Navbar({
               <div className="p-4 flex flex-col gap-2">
                 {activeLinks.map((l) => {
                   const isActive =
+                    (l.label === "Dashboard" && location.pathname.startsWith("/workspace")) ||
                     location.pathname === l.href ||
                     (l.href !== "/" &&
                       location.pathname.startsWith(

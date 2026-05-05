@@ -167,6 +167,25 @@ function FileDetail({ node, repoUrl }: { node: any | null, repoUrl?: string }) {
                 <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
                 Generating AI summary...
               </div>
+            ) : summary?.startsWith("Error:") || summary?.startsWith("Failed:") || summary?.includes("could not be fetched") ? (
+              <div className="rounded-md border border-red-500/30 bg-red-500/10 p-3 text-[12px] text-red-400">
+                <p className="font-semibold mb-1">Failed to generate summary</p>
+                <p className="opacity-80 break-words whitespace-pre-wrap">
+                  {(() => {
+                    try {
+                      const errStr = summary.replace(/^(Error:|Failed:)\s*/, '');
+                      // Try to parse JSON from the error message (Gemini API returns JSON error)
+                      const errObj = JSON.parse(errStr);
+                      if (errObj.error && errObj.error.message) {
+                        return `${errObj.error.status ? errObj.error.status + ': ' : ''}${errObj.error.message}`;
+                      }
+                      return errStr;
+                    } catch (e) {
+                      return summary.replace(/^(Error:|Failed:)\s*/, '');
+                    }
+                  })()}
+                </p>
+              </div>
             ) : (
               <p className="text-[12.5px] leading-relaxed text-muted-foreground whitespace-pre-wrap">{summary}</p>
             )}

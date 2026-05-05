@@ -271,7 +271,7 @@ RLS: enable on every user-scoped table. Use a `has_role(uid, role)` SECURITY DEF
 
 ## 8. AI integrations
 
-- **LLM provider**: default to **Lovable AI Gateway** (`LOVABLE_API_KEY` is provisioned). Fall back to OpenAI/Anthropic only if the user explicitly asks.
+- **LLM provider**: default to **Lovable AI Gateway** (`LOVABLE_API_KEY` is provisioned). Fall back to Anthropic only if the user explicitly asks.
 - **Embeddings**: `text-embedding-3-small` (1536 dims) is a good default — match the `vector(1536)` column above.
 - **Chunking**: 800–1200 token windows, 100-token overlap, language-aware splitting (don’t cut mid-function).
 - **Cost control**: cap per-analysis spend; precompute `concise` summaries up front, lazily generate `detailed` / `technical` on first click and cache.
