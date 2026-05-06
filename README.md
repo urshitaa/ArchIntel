@@ -196,7 +196,7 @@ RepoGPT/
 Add screenshots inside the `screenshots/` folder and use the following syntax:
 
 ```md
-![Dashboard](screenshots/dashboard.png)
+![Dashboard](./assets/image.png)
 ![Architecture](screenshots/architecture.png)
 ![Repository Report](screenshots/report.png)
 ```
