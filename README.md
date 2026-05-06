@@ -193,17 +193,14 @@ RepoGPT/
 
 # Screenshots
 
-Add screenshots inside the `screenshots/` folder and use the following syntax:
+ Landing page :
+ 
 <p align="center">
   <img src="src/assets/image.png" alt="RepoGPT Preview" width="900"/>
 </p>
-![RepoGPT Preview](src/assets/image.png)
 
-```md
-![Dashboard](src/assets/image.png)
-![Architecture](screenshots/architecture.png)
-![Repository Report](screenshots/report.png)
-```
+
+
 
 ---
 
