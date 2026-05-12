@@ -11,9 +11,13 @@ const DEFAULT_PEOPLE = [
 export function Contributors({ result }: { result?: any }) {
 
   // 1. Map real data
-  const rawPeople = result?.contributors && result?.contributors.length > 0
-    ? result.contributors
-    : DEFAULT_PEOPLE;
+  const rawPeople = (
+    result?.contributors && result?.contributors.length > 0
+      ? result.contributors
+      : DEFAULT_PEOPLE
+  ).filter(
+    (p: any) => p.login !== "lovable-dev[bot]"
+  );
 
   const people = useMemo(() => {
     return rawPeople.slice(0, 5).map((p: any, i: number) => {
@@ -37,7 +41,7 @@ export function Contributors({ result }: { result?: any }) {
   const maxContributions = people.length > 0 ? Math.max(...people.map((p: any) => p.contributions)) : 1;
 
   // 2. Summary stats
-  const totalContributors = result?.stats?.contributors || rawPeople.length;
+  const totalContributors = rawPeople.length;
   const totalCommits = rawPeople.reduce((acc: number, p: any) => acc + (p.contributions || 0), 0);
   const totalPrs = Math.floor(totalCommits * 0.15);
   const totalReviews = Math.floor(totalPrs * 1.2);
