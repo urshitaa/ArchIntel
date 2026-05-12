@@ -46,45 +46,74 @@ export function DashboardPage() {
     }
   }, [analysisResult]);
 
-  const handleAnalyze = () => {
+const handleAnalyze = () => {
     if (!repoUrl.trim()) return;
+
     setShowPipeline(true);
 
     const promise = fetchApi("/repositories/analyze", {
       method: "POST",
       body: JSON.stringify({ repo_url: repoUrl }),
-    }).then(res => {
-      setAnalysisResult(res);
+    })
+      .then((res) => {
 
-      try {
-        const repo = res.repository;
-        if (repo) {
-          const history = JSON.parse(localStorage.getItem('archintel_history') || '[]');
-          const entry = {
-            owner: repo.owner || 'Unknown',
-            name: repo.name || 'Unknown',
-            description: repo.description || '',
-            timestamp: new Date().toISOString(),
-          };
-          const filtered = history.filter((h: any) => !(h.owner === entry.owner && h.name === entry.name));
-          const newHistory = [entry, ...filtered].slice(0, 50);
-          localStorage.setItem('archintel_history', JSON.stringify(newHistory));
+        // Remove lovable bot contributor
+        if (res?.contributors) {
+          res.contributors = res.contributors.filter(
+            (p: any) => p.login !== "lovable-dev[bot]"
+          );
         }
-      } catch (e) {
-        console.error("Failed to save history", e);
-      }
 
-      toast.success("Repository analyzed successfully");
-      return res;
-    }).catch(err => {
-      toast.error(err.message || "Failed to analyze repository");
-      setShowPipeline(false);
-      throw err;
-    });
+        // Fix contributor count
+        if (res?.stats && res?.contributors) {
+          res.stats.contributors = res.contributors.length;
+        }
+
+        setAnalysisResult(res);
+
+        try {
+          const repo = res.repository;
+
+          if (repo) {
+            const history = JSON.parse(
+              localStorage.getItem("archintel_history") || "[]"
+            );
+
+            const entry = {
+              owner: repo.owner || "Unknown",
+              name: repo.name || "Unknown",
+              description: repo.description || "",
+              timestamp: new Date().toISOString(),
+            };
+
+            const filtered = history.filter(
+              (h: any) =>
+                !(h.owner === entry.owner && h.name === entry.name)
+            );
+
+            const newHistory = [entry, ...filtered].slice(0, 50);
+
+            localStorage.setItem(
+              "archintel_history",
+              JSON.stringify(newHistory)
+            );
+          }
+        } catch (e) {
+          console.error("Failed to save history", e);
+        }
+
+        toast.success("Repository analyzed successfully");
+
+        return res;
+      })
+      .catch((err) => {
+        toast.error(err.message || "Failed to analyze repository");
+        setShowPipeline(false);
+        throw err;
+      });
 
     setAnalysisPromise(promise);
   };
-
   return (
     <div id="dashboard-content" className="mx-auto max-w-6xl pt-8 pb-12">
       <AnimatePresence>
